@@ -1,7 +1,9 @@
 {
     "name": "61qt/laravel-foundation",
+    "description": "Laravel foundation",
     "type": "library",
     "require": {
+        "php": "^8.0.0",
         "61qt/laravel-graphql": "v0.31",
         "laravel/framework": "^8.0"
     },
@@ -9,7 +11,10 @@
     "autoload": {
         "psr-4": {
             "QT\\Foundation\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "authors": [
         {
