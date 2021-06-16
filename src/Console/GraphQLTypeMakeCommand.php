@@ -162,7 +162,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         }
 
         $resolver    = trim(str_replace('/', '\\', $type), '\\').'Resolver';
-        $rootNamespace = $this->rootNamespace().'Resolver\\';
+        $rootNamespace = $this->rootNamespace().'Resolvers\\';
 
         if (! Str::startsWith($resolver, $rootNamespace)) {
             $resolver = $rootNamespace.$resolver;
