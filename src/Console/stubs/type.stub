@@ -31,6 +31,27 @@ class DummyClass extends ModelType
     public $description = 'DummyDescription';
 
     /**
+     * 必须选中的字段(填充关联字段)
+     *
+     * @var array
+     */
+    public $mustSelection = [];
+
+    /**
+     * 详细页面进行展示的字段(填充超长字段)
+     *
+     * @var array
+     */
+    public $detailedFields = [];
+
+    /**
+     * 支持排序的字段
+     *
+     * @var array
+     */
+    protected $sortFields = [];
+
+    /**
      * 获取GraphQL resolver
      *
      * @return string
