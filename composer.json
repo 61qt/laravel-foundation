@@ -1,0 +1,20 @@
+{
+    "name": "61qt/foundation",
+    "type": "library",
+    "require": {
+        "61qt/laravel-graphql": "v0.31",
+        "laravel/framework": "^8.0"
+    },
+    "license": "bsd",
+    "autoload": {
+        "psr-4": {
+            "QT\\Foundation\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "xurh",
+            "email": "xurhwork@gmail.com"
+        }
+    ]
+}
