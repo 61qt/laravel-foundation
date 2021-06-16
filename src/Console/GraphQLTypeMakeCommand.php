@@ -84,6 +84,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
 
         $replace = ['DummyObjectName' => lcfirst($type), 'DummyDescription' => $type];
         $replace = $this->buildResolverReplacements($replace, $type);
+        $replace = $this->buildFilterReplacements($replace, $type);
         $replace = $this->buildDataStructureReplacements($replace, $table);
 
         return str_replace(

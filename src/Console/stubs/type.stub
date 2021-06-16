@@ -37,7 +37,7 @@ class DummyClass extends ModelType
      */
     public function getResolver(): Resolver
     {
-        return DummyResolver::class;
+        return new DummyResolver;
     }
 
     /**
