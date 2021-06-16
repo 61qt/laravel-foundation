@@ -1,5 +1,5 @@
 {
-    "name": "61qt/foundation",
+    "name": "61qt/laravel-foundation",
     "type": "library",
     "require": {
         "61qt/laravel-graphql": "v0.31",
