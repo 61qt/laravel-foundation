@@ -73,7 +73,7 @@ class ResolverMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return "{$rootNamespace}\Resolver";
+        return "{$rootNamespace}\Resolvers";
     }
 
     /**
@@ -115,7 +115,13 @@ class ResolverMakeCommand extends GeneratorCommand
 
         if (! class_exists($modelClass)) {
             if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $model, '--module' => $this->option('module')]);
+                $args = ['name' => $model];
+
+                if ($this->option('module')) {
+                    $args['--module'] = $this->option('module');
+                }
+
+                $this->call('make:model', $args);
             }
         }
 
