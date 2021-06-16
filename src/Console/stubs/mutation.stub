@@ -1,0 +1,61 @@
+<?php
+
+namespace DummyNamespace;
+
+use QT\GraphQL\Definition\Type;
+use QT\GraphQL\Definition\ModelMutation;
+
+/**
+ * DummyClass
+ *
+ * @package DummyNamespace
+ */
+class DummyClass extends ModelMutation
+{
+    /**
+     * object type
+     *
+     * @var string
+     */
+    protected $objectType = 'DummyObjectName';
+
+    /**
+     * 添加和修改所有字段信息
+     *
+     * @return void
+     */
+    public function args()
+    {
+        return [
+DummyDataStructure
+        ];
+    }
+
+    /**
+     * 新增和查询的方法名称
+     *
+     * @return void
+     */
+    public function getMutationList()
+    {
+        return [
+            'createDummyTypeName',
+            'updateDummyTypeName',
+            'deleteDummyTypeName',
+        ];
+    }
+
+    /**
+     * 新增和查询的方法对应参数设置
+     *
+     * @return void
+     */
+    public function getMutationArgs()
+    {
+        return [
+            'createDummyTypeName' => [],
+            'updateDummyTypeName' => [],
+            'deleteDummyTypeName' => [], 
+        ];
+    }
+}

@@ -1,0 +1,66 @@
+<?php
+
+namespace DummyNamespace;
+
+use QT\GraphQL\Resolver;
+use QT\GraphQL\FilterFactory;
+use QT\GraphQL\GraphQLManager;
+use QT\GraphQL\Definition\Type;
+use QT\GraphQL\Definition\ModelType;
+use DummyResolverClass;
+
+/**
+ * DummyClass
+ *
+ * @package DummyNamespace
+ */
+class DummyClass extends ModelType
+{
+    /**
+     * GraphQL类型名称
+     *
+     * @var string
+     */
+    public $name = 'DummyObjectName';
+
+    /**
+     * GraphQL类型描述
+     *
+     * @var string|null
+     */
+    public $description = 'DummyDescription';
+
+    /**
+     * 获取GraphQL resolver
+     *
+     * @return string
+     */
+    public function getResolver(): Resolver
+    {
+        return DummyResolver::class;
+    }
+
+    /**
+     * 获取筛选条件
+     *
+     * @return array
+     */
+    public function getFilters(): array
+    {
+        return [
+DummyFilters
+        ];
+    }
+
+    /**
+     * 获取model数据结构
+     *
+     * @return string
+     */
+    public function getDataStructure(GraphQLManager $manager): array
+    {
+        return [
+DummyDataStructure
+        ];
+    }
+}

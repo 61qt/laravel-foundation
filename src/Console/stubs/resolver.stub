@@ -1,0 +1,68 @@
+<?php
+
+namespace DummyNamespace;
+
+use QT\GraphQL\Resolver;
+use QT\GraphQL\Contracts\Context;
+use DummyFullModelClass;
+
+/**
+ * DummyClass
+ *
+ * @package DummyNamespace
+ */
+class DummyClass extends Resolver
+{
+    /**
+     * 对input内容校验规则
+     *
+     * @var array
+     */
+    protected $rules = [
+DummyRules
+    ];
+
+    /**
+     * DummyModelClass Resolver constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(new DummyModelClass);
+    }
+
+    /**
+     * 新增一条DummyModelClass
+     *
+     * @param $id
+     * @return DummyModelClass
+     * @throws \Exception
+     */
+    public function createDummyModelClass(Context $context, array $input = [])
+    {
+        return $this->store($context, $input);
+    }
+
+    /**
+     * 修改DummyModelClass
+     *
+     * @param $input
+     * @return DummyModelClass
+     * @throws \Exception
+     */
+    public function updateDummyModelClass(Context $context, array $input = [])
+    {
+        return $this->update($context, $input);
+    }
+
+    /**
+     * 删除DummyModelClass
+     *
+     * @param $input
+     * @return DummyModelClass
+     * @throws \Exception
+     */
+    public function deleteDummyModelClass(Context $context, array $input = [])
+    {
+        return $this->destroy($context, $input);
+    }
+}
