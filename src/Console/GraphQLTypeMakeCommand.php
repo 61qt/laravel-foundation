@@ -135,7 +135,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
             $type = $column->getType()->getName();
     
             if (empty($this->filterMaps[$type])) {
-                continue;
+                return;
             }
     
             $name   = $column->getName();
