@@ -141,7 +141,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     
             $name   = $column->getName();
             $method = $this->filterMaps[$type];
-            $filter = "'{$name}' => FilterFactory::{$method}('{$name}', ['=', 'in']),";
+            $filter = "'{$name}' => \$factory->{$method}('{$name}', ['=', 'in']),";
     
             return str_pad('', 8, ' ', STR_PAD_LEFT).$filter;
         });
