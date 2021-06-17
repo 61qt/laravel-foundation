@@ -3,9 +3,9 @@
 namespace DummyNamespace;
 
 use QT\GraphQL\Resolver;
-use QT\GraphQL\FilterFactory;
 use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
+use QT\GraphQL\Filters\Registrar;
 use QT\GraphQL\Definition\ModelType;
 use DummyResolverClass;
 
@@ -62,15 +62,13 @@ class DummyClass extends ModelType
     }
 
     /**
-     * 获取筛选条件
+     * 注册筛选条件
      *
-     * @return array
+     * @param Registrar $registrar
      */
-    public function getFilters(FilterFactory $factory): array
+    public function registrationFilters(Registrar $registrar)
     {
-        return [
-DummyFilters
-        ];
+
     }
 
     /**
