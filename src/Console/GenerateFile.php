@@ -54,7 +54,7 @@ class GenerateFile extends Command
             $columns = Schema::getColumnListing($table);
 
             if ($this->option('model')) {
-                $this->call('make:model', [
+                $this->call('make:graphql:model', [
                     'name'     => $model,
                     '--module' => $this->option('module'),
                 ]);

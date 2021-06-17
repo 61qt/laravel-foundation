@@ -17,6 +17,13 @@ class ModelMakeCommand extends BaseModelMakeCommand
     use GeneratorModuleHelper;
 
     /**
+     * The console command name.
+     *
+     * @var string
+     */
+    protected $name = 'make:graphql:model';
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string

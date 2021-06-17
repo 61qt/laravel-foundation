@@ -122,7 +122,7 @@ class ResolverMakeCommand extends GeneratorCommand
                     $args['--module'] = $this->option('module');
                 }
 
-                $this->call('make:model', $args);
+                $this->call('make:graphql:model', $args);
             }
         }
 
