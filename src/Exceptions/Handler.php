@@ -3,8 +3,11 @@
 namespace QT\Foundation\Exceptions;
 
 use Throwable;
+use Illuminate\Http\Request;
 use UnexpectedValueException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use GraphQL\Error\Error as GraphQLError;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
@@ -62,18 +65,25 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable('report_exception');
+
+        $this->renderable(function (Throwable $e, Request $request) {
+            // graphql会把错误包装一层抛出,所以获取原异常信息处理
+            if ($e instanceof GraphQLError) {
+                return $this->prepareJsonResponse($request, $e->getPrevious());
+            }
+        });
     }
 
     /**
-     * Convert a validation exception into a JSON response.
+     * Prepare a JSON response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Validation\ValidationException  $exception
+     * @param  \Throwable  $e
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function invalidJson($request, ValidationException $exception)
+    protected function prepareJsonResponse($request, Throwable $e)
     {
-        return $this->convertExceptionToArray($exception);
+        return new JsonResponse($this->convertExceptionToArray($e));
     }
 
     /**

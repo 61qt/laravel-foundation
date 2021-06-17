@@ -10,7 +10,7 @@ class Error extends RuntimeException
 
     protected $data = [];
 
-    protected $shouldReport = false;
+    protected $reportable = false;
 
     public function __construct($errCode = 'SYSTEM_FAILED', $message = '', $data = [])
     {
@@ -32,9 +32,9 @@ class Error extends RuntimeException
         return $this->data;
     }
 
-    public function setShouldReport($shouldReport = true)
+    public function reportable($reportable = true)
     {
-        $this->shouldReport = $shouldReport;
+        $this->reportable = $reportable;
 
         return $this;
     }
