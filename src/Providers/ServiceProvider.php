@@ -2,6 +2,7 @@
 
 namespace QT\Foundation\Providers;
 
+use QT\Foundation\Console\GenerateFile;
 use QT\Foundation\Console\ModelMakeCommand;
 use QT\Foundation\Console\ResolverMakeCommand;
 use QT\Foundation\Console\GraphQLTypeMakeCommand;
@@ -31,6 +32,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         // Register commands
         $this->commands([
+            GenerateFile::class;
             ModelMakeCommand::class,
             ResolverMakeCommand::class,
             GraphQLTypeMakeCommand::class,
