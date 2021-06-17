@@ -24,7 +24,7 @@ class DummyClass extends ModelMutation
      *
      * @return void
      */
-    public function args()
+    public function args(): array
     {
         return [
 DummyDataStructure
@@ -36,7 +36,7 @@ DummyDataStructure
      *
      * @return void
      */
-    public function getMutationList()
+    public function getMutationList(): array
     {
         return [
             'createDummyTypeName',
