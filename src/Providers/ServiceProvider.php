@@ -32,7 +32,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         // Register commands
         $this->commands([
-            GenerateFile::class;
+            GenerateFile::class,
             ModelMakeCommand::class,
             ResolverMakeCommand::class,
             GraphQLTypeMakeCommand::class,
