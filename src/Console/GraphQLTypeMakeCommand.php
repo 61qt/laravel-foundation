@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Console\GeneratorCommand;
+use QT\Foundation\Traits\GeneratorModuleHelper;
 
 /**
  * GraphQL type 生成脚本
@@ -14,7 +15,7 @@ use Illuminate\Console\GeneratorCommand;
  */
 class GraphQLTypeMakeCommand extends GeneratorCommand
 {
-    use Traits\GeneratorModuleHelper;
+    use GeneratorModuleHelper;
 
     /**
      * The name and signature of the console command.

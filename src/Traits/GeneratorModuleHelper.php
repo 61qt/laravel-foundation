@@ -1,6 +1,6 @@
 <?php
 
-namespace QT\Foundation\Console\Traits;
+namespace QT\Foundation\Traits;
 
 use Illuminate\Support\Str;
 use Doctrine\DBAL\Types\Types;

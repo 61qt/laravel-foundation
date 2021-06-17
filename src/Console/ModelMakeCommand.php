@@ -4,6 +4,7 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use QT\Foundation\Traits\GeneratorModuleHelper;
 use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
  */
 class ModelMakeCommand extends BaseModelMakeCommand
 {
-    use Traits\GeneratorModuleHelper;
+    use GeneratorModuleHelper;
 
     /**
      * Get the stub file for the generator.

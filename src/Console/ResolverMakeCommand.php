@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use Doctrine\DBAL\Types\Types;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Console\GeneratorCommand;
+use QT\Foundation\Traits\GeneratorModuleHelper;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -16,8 +17,8 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class ResolverMakeCommand extends GeneratorCommand
 {
-    use Traits\GeneratorModuleHelper {
-        Traits\GeneratorModuleHelper::getOptions as getModuleOptions;
+    use GeneratorModuleHelper {
+        GeneratorModuleHelper::getOptions as getModuleOptions;
     }
 
     /**

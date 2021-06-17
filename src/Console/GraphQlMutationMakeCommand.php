@@ -4,6 +4,7 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use QT\Foundation\Traits\GeneratorModuleHelper;
 
 /**
  * GraphQL mutation 生成脚本
@@ -12,7 +13,7 @@ use Illuminate\Console\GeneratorCommand;
  */
 class GraphQlMutationMakeCommand extends GeneratorCommand
 {
-    use Traits\GeneratorModuleHelper;
+    use GeneratorModuleHelper;
 
     /**
      * The name and signature of the console command.
