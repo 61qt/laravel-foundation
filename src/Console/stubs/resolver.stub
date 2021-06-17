@@ -4,6 +4,7 @@ namespace DummyNamespace;
 
 use QT\GraphQL\Resolver;
 use QT\GraphQL\Contracts\Context;
+use QT\Foundation\Traits\ResolverConstruct;
 use DummyFullModelClass;
 
 /**
@@ -13,6 +14,8 @@ use DummyFullModelClass;
  */
 class DummyClass extends Resolver
 {
+    use ResolverConstruct;
+
     /**
      * 对input内容校验规则
      *
@@ -23,11 +26,13 @@ DummyRules
     ];
 
     /**
-     * DummyModelClass Resolver constructor.
+     * 获取Resolver绑定model
+     *
+     * @return DummyModelClass
      */
-    public function __construct()
+    public function getModel()
     {
-        parent::__construct(new DummyModelClass);
+        return new DummyModelClass;
     }
 
     /**
