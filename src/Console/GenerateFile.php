@@ -62,9 +62,9 @@ class GenerateFile extends Command
 
             if ($this->option('resolver')) {
                 $this->call('make:graphql:resolver', [
-                    'name'      => "{$model}Resolver",
-                    '--module'  => $this->option('module'),
-                    '--rules'   => join(',', $columns),
+                    'name'     => "{$model}Resolver",
+                    '--module' => $this->option('module'),
+                    '--rules'  => join(',', $columns),
                 ]);
             }
 
