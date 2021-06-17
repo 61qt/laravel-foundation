@@ -68,7 +68,7 @@ class DummyClass extends ModelType
      */
     public function registrationFilters(Registrar $registrar)
     {
-
+DummyFilters
     }
 
     /**
