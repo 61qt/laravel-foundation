@@ -130,24 +130,33 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
             $columns = array_merge($columns, $index->getColumns());
         }
 
+        $filters = [];
         $columns = collect(array_unique($columns));
-        $filters = $columns->map(function ($column) use ($table) {
+        foreach ($columns as $column) {
             $column = Schema::getConnection()->getDoctrineColumn($table, $column);
     
             $type = $column->getType()->getName();
     
             if (empty($this->filterMaps[$type])) {
-                return;
+                continue;
             }
     
             $name   = $column->getName();
             $method = $this->filterMaps[$type];
-            $filter = "'{$name}' => \$factory->{$method}('{$name}', ['=', 'in']),";
-    
-            return str_pad('', 8, ' ', STR_PAD_LEFT).$filter;
-        });
+            $filter = "->{$method}('{$name}', ['=', 'in'])";
 
-        return array_merge($replace, ['DummyFilters' => $filters->implode("\n")]);
+            $filters[] = str_pad('', 12, ' ', STR_PAD_LEFT).$filter;
+        }
+
+        if (!empty($filters)) {
+            $filters = sprintf(
+                "%s\$registrar\n%s;",
+                str_pad('', 8, ' ', STR_PAD_LEFT),
+                implode("\n", $filters),
+            );
+        }
+
+        return array_merge($replace, ['DummyFilters' => $filters]);
     }
 
     /**

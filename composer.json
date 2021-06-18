@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": "^8.0.0",
-        "61qt/laravel-graphql": "^v0.40",
+        "61qt/laravel-graphql": "^v0.10",
         "laravel/framework": "^8.0",
         "doctrine/dbal": "^2.6|^3.0"
     },
