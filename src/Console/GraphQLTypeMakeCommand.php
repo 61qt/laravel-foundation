@@ -148,7 +148,9 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
             $filters[] = str_pad('', 12, ' ', STR_PAD_LEFT).$filter;
         }
 
-        if (!empty($filters)) {
+        if (empty($filters)) {
+            $filters = '';
+        } else {
             $filters = sprintf(
                 "%s\$registrar\n%s;",
                 str_pad('', 8, ' ', STR_PAD_LEFT),
