@@ -19,7 +19,7 @@ class ImportTaskMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return resource_path('stubs/import-task.stub');
+        return __DIR__.'/stubs/import-task.stub';
     }
 
     /**
