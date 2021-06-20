@@ -22,7 +22,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:graphql:type';
+    protected $name = 'make:graphql-type';
 
     /**
      * The console command description.
@@ -106,7 +106,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
 
         if (! class_exists($resolverClass)) {
             if ($this->confirm("{$resolverClass} 不存在. 是否要生成?", true)) {
-                $this->call('make:graphql:resolver', ['name' => "{$type}Resolver", '--module' => $this->option('module')]);
+                $this->call('make:graphql-resolver', ['name' => "{$type}Resolver", '--module' => $this->option('module')]);
             }
         }
 

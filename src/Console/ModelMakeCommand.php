@@ -21,7 +21,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
      *
      * @var string
      */
-    protected $name = 'make:graphql:model';
+    protected $name = 'make:graphql-model';
 
     /**
      * Get the stub file for the generator.

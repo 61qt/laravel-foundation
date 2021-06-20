@@ -54,14 +54,14 @@ class GenerateFile extends Command
             $columns = Schema::getColumnListing($table);
 
             if ($this->option('model')) {
-                $this->call('make:graphql:model', [
+                $this->call('make:graphql-model', [
                     'name'     => $model,
                     '--module' => $this->option('module'),
                 ]);
             }
 
             if ($this->option('resolver')) {
-                $this->call('make:graphql:resolver', [
+                $this->call('make:graphql-resolver', [
                     'name'     => "{$model}Resolver",
                     '--module' => $this->option('module'),
                     '--rules'  => join(',', $columns),
@@ -69,14 +69,14 @@ class GenerateFile extends Command
             }
 
             if ($this->option('type')) {
-                $this->call('make:graphql:type', [
+                $this->call('make:graphql-type', [
                     'name'     => $model,
                     '--module' => $this->option('module'),
                 ]);
             }
 
             if ($this->option('mutation')) {
-                $this->call('make:graphql:mutation', [
+                $this->call('make:graphql-mutation', [
                     'name'     => "{$model}Mutation",
                     '--module' => $this->option('module'),
                 ]);

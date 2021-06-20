@@ -26,7 +26,7 @@ class ResolverMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:graphql:resolver';
+    protected $name = 'make:graphql-resolver';
 
     /**
      * The type of class being generated.
@@ -122,7 +122,7 @@ class ResolverMakeCommand extends GeneratorCommand
                     $args['--module'] = $this->option('module');
                 }
 
-                $this->call('make:graphql:model', $args);
+                $this->call('make:graphql-model', $args);
             }
         }
 

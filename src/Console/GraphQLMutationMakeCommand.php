@@ -20,7 +20,7 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:graphql:mutation';
+    protected $name = 'make:graphql-mutation';
 
     /**
      * The console command description.
@@ -73,7 +73,7 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
 
         if (!class_exists($typeClass)) {
             if ($this->confirm("{$typeClass} 不存在. 是否要生成?", true)) {
-                $this->call('make:graphql:type', ['name' => $type, '--module' => $this->option('module')]);
+                $this->call('make:graphql-type', ['name' => $type, '--module' => $this->option('module')]);
             }
         }
 

@@ -10,7 +10,7 @@ class ImportTaskMakeCommand extends GeneratorCommand
 {
     use GeneratorModuleHelper;
 
-    protected $name = 'make:task:import';
+    protected $name = 'make:import-task';
 
     /**
      * Get the stub file for the generator.
@@ -19,7 +19,7 @@ class ImportTaskMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/import-task.stub';
+        return __DIR__.'/stubs/import_task.stub';
     }
 
     /**
