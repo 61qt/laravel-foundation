@@ -6,7 +6,8 @@
         "php": "^8.0.0",
         "61qt/laravel-graphql": "^v0.11",
         "laravel/framework": "^8.0",
-        "doctrine/dbal": "^2.6|^3.0"
+        "doctrine/dbal": "^2.6|^3.0",
+        "61qt/import": "dev-main"
     },
     "autoload": {
         "psr-4": {

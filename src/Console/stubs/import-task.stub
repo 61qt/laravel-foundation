@@ -1,0 +1,78 @@
+<?php
+
+namespace DummyNamespace;
+
+use QT\Import\Task;
+use QT\Import\Rules\Unique;
+use QT\Import\Rules\Exists;
+
+class DummyClass extends Task
+{
+    /**
+     * 导入字段.
+     *
+     * @var array
+     */
+    protected $fields = [
+
+    ];
+
+    /**
+     * 导入规则.
+     *
+     * @var array
+     */
+    protected $rules = [
+
+    ];
+
+    /**
+     * 检查并格式化一行数据
+     *
+     * @param array $data
+     * @param int $line
+     * @return array
+     */
+    protected function checkAndFormatRow(array $data, int $line): array
+    {
+        $data = parent::checkAndFormatRow($data, $line);
+
+        // Do somethings...
+
+        return $data;
+    }
+
+    /**
+     * 需要在excel表内检查唯一性的字段组合 
+     *
+     * @return array
+     */
+    protected function getExcelUniqueFields(): array
+    {
+        return [
+
+        ];
+    }
+
+    /**
+     * 批量检查过滤器 
+     *
+     * @return array
+     */
+    protected function getRowsRules(): array
+    {
+        return [
+
+        ];
+    }
+
+    /**
+     * 插入到数据库.
+     *
+     * @return mixed
+     */
+    protected function insertDB()
+    {
+        // 
+    }
+}
