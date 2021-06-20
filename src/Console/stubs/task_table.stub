@@ -1,0 +1,48 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class Create{{tableClassName}}Table extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('{{table}}', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id')->comment('任务创建者id');
+            $table->string('name', 100)->comment('任务名称');
+            $table->unsignedTinyInteger('type')->comment('任务类型(EXPORT:导出,IMPORT:导入)');
+            $table->unsignedTinyInteger('status')->comment('生成状态(NORMAL:执行中,SUCCESS:成功,FAILED:失败,WARNING:警报,EXPIRED:过期)');
+            $table->string('payload', 512)->nullable()->comment('任务传递中缓存的内容');
+            $table->string('download_url', 256)->comment('下载链接');
+            $table->text('messages')->nullable()->comment('异步任务备注信息');
+
+            $table->unsignedInteger('task_count')->comment('需要生成的异步任务数量');
+            $table->unsignedInteger('current_count')->comment('当前异步任务生成数量');
+            $table->unsignedInteger('progress')->comment('生成进度百分比');
+            $table->unsignedInteger('expired_at')->comment('过期时间');
+
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+
+            $table->index('user_id');
+            $table->index('expired_at');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('{{table}}');
+    }
+}
