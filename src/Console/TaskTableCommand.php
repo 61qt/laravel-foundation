@@ -14,7 +14,7 @@ class TaskTableCommand extends Command
      *
      * @var string
      */
-    protected $name = 'make:task-table {--table=async_tasks}';
+    protected $signature = 'make:task-table {--table=async_tasks : 表名}';
 
     /**
      * The console command description.
@@ -65,8 +65,6 @@ class TaskTableCommand extends Command
         );
 
         $this->info('Migration created successfully!');
-        // 生成model
-        $this->call('make:graphql-model', ['name' => $model]);
 
         $this->composer->dumpAutoloads();
     }

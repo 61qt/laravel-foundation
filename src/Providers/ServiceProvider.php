@@ -3,6 +3,7 @@
 namespace QT\Foundation\Providers;
 
 use QT\Foundation\Console\GenerateFile;
+use QT\Foundation\Console\TaskTableCommand;
 use QT\Foundation\Console\ModelMakeCommand;
 use QT\Foundation\Console\ResolverMakeCommand;
 use QT\Foundation\Console\ImportTaskMakeCommand;
@@ -35,6 +36,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->commands([
             GenerateFile::class,
             ModelMakeCommand::class,
+            TaskTableCommand::class,
             ResolverMakeCommand::class,
             ImportTaskMakeCommand::class,
             GraphQLTypeMakeCommand::class,
