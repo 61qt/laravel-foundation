@@ -16,7 +16,7 @@ trait Enumerable
     /**
      * @var array
      */
-    protected static $enums = [];
+    public static $enums = [];
 
     /**
      * 没有设置枚举的字段用的默认值

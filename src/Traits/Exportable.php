@@ -15,29 +15,30 @@ trait Exportable
     use Enumerable;
 
     /**
+     * TODO 不使用静态变量,保证在异步任务中每次处理新任务都会刷新
      * 导出时每一个字段对应的format逻辑
      * 
      * @var array
      */
-    protected static $handlers = [];
+    protected $handlers = [];
 
     /**
      * 获取导出字段处理方式
      *
      * @return array
      */
-    public static function getExportHandler(): array
+    public function getExportHandler(): array
     {
-        if (!empty(static::$handlers)) {
-            return static::$handlers;
+        if (!empty($this->handlers)) {
+            return $this->handlers;
         }
 
         // 自动转换枚举字段
         foreach (static::getEnums() as $field => $dictionary) {
-            static::$handlers[$field] = array_flip($dictionary->all());
+            $this->handlers[$field] = array_flip($dictionary->all());
         }
 
-        return static::$handlers;
+        return $this->handlers;
     }
 
     /**
@@ -93,7 +94,7 @@ trait Exportable
     protected function getValue(string $field, $selected)
     {
         $value    = $this->getAttribute($field);
-        $handlers = static::getExportHandler();
+        $handlers = $this->getExportHandler();
 
         if (array_key_exists($field, $handlers)) {
             if (is_callable($handlers[$field])) {
