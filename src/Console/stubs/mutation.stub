@@ -32,20 +32,6 @@ DummyDataStructure
     }
 
     /**
-     * 新增和查询的方法名称
-     *
-     * @return void
-     */
-    public function getMutationList(): array
-    {
-        return [
-            'createDummyTypeName',
-            'updateDummyTypeName',
-            'deleteDummyTypeName',
-        ];
-    }
-
-    /**
      * 新增和查询的方法对应参数设置
      *
      * @return void
