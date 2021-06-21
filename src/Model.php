@@ -222,18 +222,19 @@ class Model extends EloquentModel
          * @param array $columns
          */
         $query->macro('safeDecrement', function ($columns) {
-            $update = [];
+            $values = [];
             foreach ($columns as $column => $amount) {
                 if (!is_numeric($amount) || $amount <= 0) {
                     continue;
                 }
 
-                $update[$column] = DB::raw("IF(`{$column}` >= {$amount}, `{$column}` - {$amount}, 0)");
+                $values[$column] = DB::raw("IF(`{$column}` >= {$amount}, `{$column}` - {$amount}, 0)");
             }
 
-            if (!empty($update)) {
+            if (!empty($values)) {
                 // macro时$this会指向Builder
-                $this->update($update);
+                /** @var Builder $this */
+                $this->update($values);
             }
         });
 
