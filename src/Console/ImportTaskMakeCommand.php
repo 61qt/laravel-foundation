@@ -1,6 +1,6 @@
 <?php
 
-namespace QT\Foundation\Console\Commands;
+namespace QT\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use QT\Foundation\Traits\GeneratorModuleHelper;
