@@ -43,11 +43,11 @@ trait Enumerable
 
             if (method_exists(static::class, "get{$column}Dictionary")) {
                 $value = static::{"get{$column}Dictionary"}();
-            } else {
+            } elseif (property_exists(static::class, $name)) {
                 $value = $reflect->getStaticPropertyValue($name);
             }
 
-            if ($value === null) {
+            if (empty($value)) {
                 $value = static::getDefaultDict();
             }
 

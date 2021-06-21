@@ -87,10 +87,10 @@ trait Exportable
 
     /**
      * @param string $field
-     * @param array  $selected
+     * @param array|bool $selected
      * @return string|Model|Collection
      */
-    protected function getValue(string $field, array $selected)
+    protected function getValue(string $field, $selected)
     {
         $value    = $this->getAttribute($field);
         $handlers = static::getExportHandler();
@@ -105,6 +105,10 @@ trait Exportable
             }
         }
 
+        if (!is_array($selected) || !is_object($value)) {
+            return $value;
+        }
+
         if ($value instanceof self) {
             return $value->formatData($selected);
         }
@@ -114,7 +118,5 @@ trait Exportable
                 return $model->formatData($selected);
             });
         }
-
-        return $value;
     }
 }
