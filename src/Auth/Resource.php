@@ -66,15 +66,15 @@ class Resource
         return [$unAuthColumns, $selection];
     }
 
-   /**
-    * 获取可以查询的graphql字段
-    *
-    * @param GraphQLAuthenticatable $user
-    * @param Context $context
-    * @param string $type
-    * @param array $selection
-    * @return array
-    */
+    /**
+     * 获取可以查询的graphql字段
+     *
+     * @param GraphQLAuthenticatable $user
+     * @param Context $context
+     * @param string $type
+     * @param array $selection
+     * @return array
+     */
     public static function getAllowColumns(
         GraphQLAuthenticatable $user,
         Context $context,
@@ -119,7 +119,7 @@ class Resource
         GraphQLAuthenticatable $user,
         Context $context,
         string $exportTask
-    ) {
+    ): bool {
         $resources = $user->getResources($context);
 
         return isset($resources[$exportTask]);
@@ -137,7 +137,7 @@ class Resource
         GraphQLAuthenticatable $user,
         Context $context,
         string $importTask
-    ) {
+    ): bool {
         $resources = $user->getResources($context);
 
         return isset($resources[$importTask]);
