@@ -5,9 +5,19 @@ namespace DummyNamespace;
 use QT\Import\Task;
 use QT\Import\Rules\Unique;
 use QT\Import\Rules\Exists;
+use QT\Foundation\Traits\ImportTaskConstruct;
 
 class DummyClass extends Task
 {
+    use ImportTaskConstruct;
+
+    /**
+     * 导入关联model
+     *
+     * @var string
+     */
+    protected $model = '';
+
     /**
      * 导入字段.
      *
@@ -24,6 +34,15 @@ class DummyClass extends Task
      */
     protected $rules = [
 
+    ];
+
+    /**
+     * 下拉可选列
+     *
+     * @var array
+     */
+    protected $optional = [
+        
     ];
 
     /**
