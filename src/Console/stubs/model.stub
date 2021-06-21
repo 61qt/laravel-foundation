@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Database\Eloquent\Model;
+use QT\Foundation\Model;
 
 class DummyClass extends Model
 {
