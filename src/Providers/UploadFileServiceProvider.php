@@ -1,8 +1,8 @@
 <?php
 namespace QT\Foundation\Providers;
 
-use App\Utils\UploadFile\UploadManager;
 use Illuminate\Support\ServiceProvider;
+use QT\Foundation\UploadFile\UploadManager;
 use QT\Foundation\Contracts\UploadFileClient;
 
 // 注册文件上传服务
