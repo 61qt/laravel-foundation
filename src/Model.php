@@ -143,62 +143,6 @@ class Model extends EloquentModel
     }
 
     /**
-     * Determine whether a value is JSON castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    protected function isJsonCastable($key)
-    {
-        return $this->hasCast($key, [
-            'array', 'json', 'object', 'collection', 'object_unicode', 'json_unicode',
-        ]);
-    }
-
-    /**
-     * Cast an attribute to a native PHP type.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function castAttribute($key, $value)
-    {
-        $type = $this->getCastType($key);
-
-        if (!empty($value) && in_array($type, [
-            'object_unicode',
-            'json_unicode',
-        ])) {
-            return $this->fromJson($value);
-        } else {
-            return parent::castAttribute($key, $value);
-        }
-    }
-
-    /**
-     * Cast the given attribute to JSON.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function castAttributeAsJson($key, $value)
-    {
-        $type = $this->getCastType($key);
-
-        if ($type === 'object_unicode') {
-            $options = JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT;
-        } elseif ($type === 'json_unicode') {
-            $options = JSON_UNESCAPED_UNICODE;
-        } else {
-            return parent::castAttributeAsJson($key, $value);
-        }
-
-        return json_encode($value, $options);
-    }
-
-    /**
      * Get a new query builder instance for the connection.
      *
      * @return \Illuminate\Database\Query\Builder
