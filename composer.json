@@ -7,7 +7,7 @@
         "61qt/laravel-graphql": "^v0.14",
         "laravel/framework": "^8.0",
         "doctrine/dbal": "^2.6|^3.0",
-        "61qt/import": "^v1.12",
+        "61qt/import": "^v1.13",
         "guzzlehttp/guzzle": "^7.3"
     },
     "autoload": {
