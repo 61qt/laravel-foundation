@@ -9,6 +9,18 @@ use QT\Foundation\Contracts\UploadFileClient;
 class UploadFileServiceProvider extends ServiceProvider
 {
     /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $configPath = __DIR__ . '/../../config/upload.php';
+
+        $this->publishes([$configPath => config_path('upload.php')], 'upload');
+    }
+
+    /**
      * Register any application services.
      *
      * @return void
@@ -16,7 +28,7 @@ class UploadFileServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('uploadFile', function ($app) {
-            $config = $app->make('config')->get('upload');
+            $config = $app->make('config')->get('upload', []);
 
             return new UploadManager($config);
         });

@@ -9,6 +9,18 @@ use Illuminate\Support\ServiceProvider;
 class SmsServiceProvider extends ServiceProvider
 {
     /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $configPath = __DIR__ . '/../../config/sms.php';
+
+        $this->publishes([$configPath => config_path('sms.php')], 'sms');
+    }
+
+    /**
      * Register any application services.
      *
      * @return void
@@ -16,7 +28,7 @@ class SmsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('sms', function ($app) {
-            $config = $app->make('config')->get('sms');
+            $config = $app->make('config')->get('sms', []);
 
             return new SmsManager($config);
         });
