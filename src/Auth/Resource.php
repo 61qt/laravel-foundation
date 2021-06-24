@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Auth;
+namespace QT\Foundation\Auth;
 
 use QT\GraphQL\Contracts\Context;
-use App\Auth\GraphQLAuthenticatable;
+use QT\Foundation\Auth\GraphQLAuthenticatable;
 
 class Resource
 {
