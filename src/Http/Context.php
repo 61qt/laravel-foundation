@@ -44,6 +44,16 @@ class Context implements ContextContract
      * @param mixed $default
      * @return mixed
      */
+    public function setVale(string $key, mixed $value)
+    {
+        return Arr::set($this->config, $key, $value);
+    }
+
+    /**
+     * @param string|int $key
+     * @param mixed $default
+     * @return mixed
+     */
     public function getValue(string|int $key, mixed $default = null): mixed
     {
         return Arr::get($this->config, $key, $default);
