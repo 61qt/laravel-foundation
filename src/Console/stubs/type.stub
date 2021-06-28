@@ -54,7 +54,7 @@ class DummyClass extends ModelType
     /**
      * 获取GraphQL resolver
      *
-     * @return string
+     * @return Resolver
      */
     public function getResolver(): Resolver
     {
@@ -74,7 +74,7 @@ DummyFilters
     /**
      * 获取model数据结构
      *
-     * @return string
+     * @return array
      */
     public function getDataStructure(GraphQLManager $manager): array
     {
