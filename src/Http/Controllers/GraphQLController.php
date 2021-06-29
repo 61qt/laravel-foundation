@@ -13,6 +13,7 @@ use QT\Foundation\ModuleRepository;
 use Illuminate\Support\Facades\Auth;
 use GraphQL\Validator\Rules\QueryDepth;
 use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\FieldsOnCorrectType;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
 class GraphQLController
@@ -62,11 +63,15 @@ class GraphQLController
             $this->getGraphQlRules($context)
         );
 
-        if (count($results->errors) > 0) {
+        if (!empty($results->errors)) {
             throw $results->errors[0];
         }
 
-        return $results;
+        return [
+            'code' => 0,
+            'msg'  => 'success',
+            'data' => $results->data,
+        ];
     }
 
     protected function getGraphQLManager(): GraphQLManager
@@ -100,6 +105,7 @@ class GraphQLController
     protected function getGraphQlRules(Context $context)
     {
         return [
+            new FieldsOnCorrectType,
             new QueryDepth($context->getValue('max_depth')),
             new QueryComplexity($context->getValue('complexity')),
             new DisableIntrospection($context->getValue('introspection', 0)),
