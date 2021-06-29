@@ -194,4 +194,23 @@ class Model extends EloquentModel
 
         return $query;
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::eventBoot();
+
+        static::baseModelBoot();
+    }
+
+    protected static function eventBoot()
+    {
+
+    }
+
+    protected static function baseModelBoot()
+    {
+
+    }
 }
