@@ -71,12 +71,7 @@ abstract class ModelType extends BaseModelType
                 $fieldDef = $fields[$field];
             }
 
-            $type = $fieldDef['type'];
-            if ($type instanceof ListOfType) {
-                $type = $type->getOfType();
-            } elseif ($type instanceof NonNull) {
-                $type = $type->getOfType();
-            }
+            [$type, $wrap] = $this->unwrap($fieldDef['type']);
 
             if (!$type instanceof ModelType) {
                 $results[$field] = $fieldDef;
@@ -84,7 +79,7 @@ abstract class ModelType extends BaseModelType
             } elseif (!is_array($child)) {
                 continue;
             } elseif (isset($child['*'])) {
-                $results[$field] = $type;
+                $results[$field] = $fieldDef['type'];
                 continue;
             }
 
@@ -95,12 +90,32 @@ abstract class ModelType extends BaseModelType
                 );
             };
 
-            $results[$field] = $this->manager->create(
+            $results[$field] = $wrap($this->manager->create(
                 Str::camel("{$this->name}_{$field}_object"), $func
-            );
+            ));
         }
 
         return $results;
+    }
+
+    /**
+     * 如果type有包装,将其包装解除并返回包装回调函数
+     * 
+     * @param Type $type
+     * @return array
+     */
+    protected function unwrap($type)
+    {
+        $wrap = function ($type) { return $type; };
+        if ($type instanceof ListOfType) {
+            $type = $type->getOfType();
+            $wrap = function ($type) { return Type::listOf($type); };
+        } elseif ($type instanceof NonNull) {
+            $type = $type->getOfType();
+            $wrap = function ($type) { return Type::nonNull($type); };
+        }
+
+        return [$type, $wrap];
     }
 
     /**
