@@ -78,8 +78,10 @@ abstract class ModelType extends BaseModelType
                 $type = $type->getOfType();
             }
 
-            if (!is_array($child) || !$type instanceof ModelType) {
+            if (!$type instanceof ModelType) {
                 $results[$field] = $fieldDef;
+                continue;
+            } elseif (!is_array($child)) {
                 continue;
             }
 
