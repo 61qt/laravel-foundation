@@ -37,7 +37,7 @@ abstract class ModelType extends BaseModelType
             return $fields;
         }
 
-        return $this->defineFieldMap($fields, $this->canAccess);
+        return $this->defineAccessFields($fields, $this->canAccess);
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class ModelType extends BaseModelType
      * @param array $canAccess
      * @return array
      */
-    protected function defineFieldMap(array $fields, array $canAccess)
+    protected function defineAccessFields(array $fields, array $canAccess)
     {
         if (isset($canAccess['*'])) {
             // 允许全部字段访问时,根据可访问字段构建
@@ -87,7 +87,7 @@ abstract class ModelType extends BaseModelType
 
             // 根据配置生成可访问字段
             $func = function () use ($type, $child) {
-                return $this->defineFieldMap(
+                return $this->defineAccessFields(
                     $type->getDataStructure($this->manager), $child
                 );
             };
