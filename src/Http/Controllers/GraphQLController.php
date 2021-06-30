@@ -4,14 +4,16 @@ namespace QT\Foundation\Http\Controllers;
 
 use Error;
 use GraphQL\GraphQL;
+use RuntimeException;
+use GraphQL\Type\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use QT\GraphQL\GraphQLManager;
 use QT\Foundation\Http\Context;
-use QT\Foundation\GraphQL\Schema;
 use QT\Foundation\ModuleRepository;
 use Illuminate\Support\Facades\Auth;
 use GraphQL\Validator\Rules\QueryDepth;
+use QT\Foundation\GraphQL\SchemaConfig;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\FieldsOnCorrectType;
 use GraphQL\Validator\Rules\DisableIntrospection;
@@ -86,15 +88,17 @@ class GraphQLController
         foreach ($this->namespaces as $namespace) {
             $type = sprintf('%s\\%s\\%s', $namespace, $space, ucfirst($name));
 
-            if (class_exists($type)) {
-                return new $type($manager);
+            if (!class_exists($type)) {
+                throw new RuntimeException("{$type} Class Not Found");
             }
+
+            return app($type, compact('manager'));
         }
     }
 
     protected function getSchema(GraphQLManager $manager, Context $context): Schema
     {
-        return Schema::create($manager, $context->getValue('graphql_schema'));
+        return new Schema(SchemaConfig::make($manager, $context->getValue('graphql_schema')));
     }
 
     protected function getRootValue(Context $context)

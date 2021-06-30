@@ -83,6 +83,9 @@ abstract class ModelType extends BaseModelType
                 continue;
             } elseif (!is_array($child)) {
                 continue;
+            } elseif (isset($child['*'])) {
+                $results[$field] = $type;
+                continue;
             }
 
             // 根据配置生成可访问字段
