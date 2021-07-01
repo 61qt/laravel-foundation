@@ -6,7 +6,7 @@ use QT\GraphQL\Resolver;
 use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
 use QT\GraphQL\Filters\Registrar;
-use QT\Foundation\GraphQL\Type\ModelType;
+use QT\Foundation\GraphQL\Definition\ModelType;
 use DummyResolverClass;
 
 /**

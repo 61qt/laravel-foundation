@@ -1,6 +1,6 @@
 <?php
 
-namespace QT\Foundation\GraphQL\Type;
+namespace QT\Foundation\GraphQL\Definition;
 
 use Illuminate\Support\Str;
 use QT\GraphQL\GraphQLManager;
@@ -13,7 +13,7 @@ use QT\GraphQL\Definition\ModelType as BaseModelType;
 /**
  * ModelType
  *
- * @package QT\Foundation\GraphQL\Type
+ * @package QT\Foundation\GraphQL\Definition
  */
 abstract class ModelType extends BaseModelType
 {

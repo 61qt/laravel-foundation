@@ -3,7 +3,7 @@
 namespace QT\Foundation\GraphQL;
 
 use QT\GraphQL\GraphQLManager;
-use QT\Foundation\GraphQL\Type\ModelType;
+use QT\Foundation\GraphQL\Definition\ModelType;
 
 class RbacQuery extends Query
 {
