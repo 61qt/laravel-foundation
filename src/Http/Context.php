@@ -62,6 +62,15 @@ class Context implements ContextContract
      * @param array $config
      * @return void
      */
+    public function has(string | int $key)
+    {
+        return Arr::has($this->config, $key);
+    }
+
+    /**
+     * @param array $config
+     * @return void
+     */
     public function merge(array $config)
     {
         $this->config = array_merge($this->config, $config);
