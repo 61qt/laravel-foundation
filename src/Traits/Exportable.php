@@ -15,12 +15,23 @@ trait Exportable
     use Enumerable;
 
     /**
-     * TODO 不使用静态变量,保证在异步任务中每次处理新任务都会刷新
      * 导出时每一个字段对应的format逻辑
      * 
      * @var array
      */
     protected $handlers = [];
+
+    /**
+     * 设置导出字段处理方式
+     *
+     * @return static
+     */
+    public function setExportHandler(array $handlers)
+    {
+        $this->handlers = $handlers;
+
+        return $this;
+    }
 
     /**
      * 获取导出字段处理方式
@@ -91,7 +102,7 @@ trait Exportable
      * @param array|bool $selected
      * @return string|Model|Collection
      */
-    protected function getValue(string $field, $selected)
+    protected function getValue($field, $selected)
     {
         $value    = $this->getAttribute($field);
         $handlers = $this->getExportHandler();
