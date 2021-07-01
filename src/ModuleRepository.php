@@ -26,11 +26,11 @@ class ModuleRepository
     /**
      * @param string $key
      * @param mixed $default
-     * @return Collection|mixed|null
+     * @return Collection
      */
-    public function config(string $key, mixed $default = null): mixed
+    public function config(string $module): Collection
     {
-        return Arr::get($this->modules, $key, $default);
+        return $this->modules[$module];
     }
 
     /**
@@ -134,7 +134,7 @@ class ModuleRepository
     {
         // 获取graphql语法
         if (file_exists($path)) {
-            $config['graphql_schema'] = require $path;
+            $config->offsetSet('graphql', ['schema' => require $path]);
         }
     }
 }
