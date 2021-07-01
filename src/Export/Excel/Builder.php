@@ -2,23 +2,19 @@
 
 namespace QT\Foundation\Export\Excel;
 
+use Iterator;
 use QT\Foundation\Model;
 use QT\GraphQL\Resolver;
 use Box\Spout\Common\Type;
 use Illuminate\Support\Arr;
 use Box\Spout\Common\Entity\Row;
+use QT\GraphQL\Contracts\Context;
+use QT\GraphQL\Options\ExportOption;
 use Box\Spout\Writer\Common\Creator\WriterFactory;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 class Builder
 {
-    /**
-     * 选中的要导出字段
-     *
-     * @var array
-     */
-    protected $selectedColumns = [];
-
     /**
      * resolver中select的字段
      * [
@@ -33,6 +29,28 @@ class Builder
      * @var array
      */
     protected $selection = [];
+
+    /**
+     * 选中的要导出字段
+     *
+     * @var array
+     */
+    protected $selectedColumns = [];
+
+
+    /**
+     * 导出时页码
+     *
+     * @var int
+     */
+    protected $offset = 0;
+
+    /**
+     * 一次性查询数量
+     *
+     * @var int
+     */
+    protected $limit = 1000;
 
     /**
      * 上报间隔
@@ -54,13 +72,6 @@ class Builder
      * @var int
      */
     protected $reportAt = 0;
-
-    /**
-     * 默认加载的scope
-     *
-     * @var array
-     */
-    protected $scopes = [];
 
     /**
      * Builder Construct
@@ -94,7 +105,13 @@ class Builder
         }
     }
 
-    public function export(Resolver $resolver)
+    /**
+     * 从Resolver导出数据
+     *
+     * @param Resolver $resolver
+     * @return string
+     */
+    public function export(Resolver $resolver, Context $context)
     {
         $path   = tempnam('/tmp', 'export-');
         $writer = WriterFactory::createFromType(Type::XLSX);
@@ -107,8 +124,10 @@ class Builder
             // 获取format的回调与字典
             $handlers = $model instanceof Model ? $model->getExportHandler() : [];
 
-            foreach ($this->getExportData($resolver) as $data) {
+            foreach ($this->getExportData($resolver, $context) as $data) {
                 $writer->addRow($this->wrap($this->formatRow($data, $handlers)));
+
+                $this->reportGenerateProgress(1);
             }
 
             $writer->close();
@@ -137,21 +156,25 @@ class Builder
     /**
      * 获取导出数据
      *
-     * @return \Iterable
+     * @return Iterator
      */
-    protected function getExportData(Resolver $resolver, $limit = 1000, $offset = 0)
+    protected function getExportData(Resolver $resolver, Context $context): Iterator
     {
-        $query = $resolver->generateSql($this->selection, $this->filters);
+        return $resolver->export($context, $this->getExportOption(), $this->selection);
+    }
 
-        do {
-            $models = (clone $query)->forPage(++$offset, $limit)->get();
-
-            foreach ($models as $model) {
-                yield $model;
-            }
-
-            $this->reportGenerateProgress($models->count());
-        } while ($models->isNotEmpty());
+    /**
+     * 获取导出选项
+     *
+     * @return ExportOption
+     */
+    protected function getExportOption()
+    {
+        return new ExportOption([
+            'filters' => $this->filters,
+            'limit'   => $this->limit,
+            'offset'  => $this->offset,
+        ]);
     }
 
     /**
@@ -169,7 +192,7 @@ class Builder
         }
 
         $row = [];
-        foreach ($this->selectedColumns as $column) {
+        foreach (array_keys($this->selectedColumns) as $column) {
             $row[] = Arr::get($data, $column);
         }
 
@@ -186,12 +209,12 @@ class Builder
         // 缓存当前新增进度
         $this->count += $progress;
         // 检查离上次上报时间的间隔
-        if ($this->reportAt === 0 || time() > $this->reportAt + $this->interval) {
+        if (time() >= $this->reportAt) {
             // TODO 触发事件
-            // emit('progress')
+            // emit('progress', $this->count)
 
             $this->count    = 0;
-            $this->reportAt = time();
+            $this->reportAt = time() + $this->interval;
         }
     }
 
