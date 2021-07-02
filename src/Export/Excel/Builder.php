@@ -9,7 +9,7 @@ use Box\Spout\Common\Type;
 use Illuminate\Support\Arr;
 use Box\Spout\Common\Entity\Row;
 use QT\GraphQL\Contracts\Context;
-use QT\GraphQL\Options\ExportOption;
+use QT\GraphQL\Options\CursorOption;
 use Box\Spout\Writer\Common\Creator\WriterFactory;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
@@ -166,11 +166,11 @@ class Builder
     /**
      * 获取导出选项
      *
-     * @return ExportOption
+     * @return CursorOption
      */
     protected function getExportOption()
     {
-        return new ExportOption([
+        return new CursorOption([
             'filters' => $this->filters,
             'limit'   => $this->limit,
             'offset'  => $this->offset,
