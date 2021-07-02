@@ -47,7 +47,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     protected $filterMaps = [
         'integer'  => 'int',
         'smallint' => 'int',
-        'bigint'   => 'int',
+        'bigint'   => 'bigint',
         'string'   => 'string',
         'text'     => 'string',
     ];

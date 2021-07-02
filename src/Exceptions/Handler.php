@@ -50,6 +50,10 @@ class Handler extends ExceptionHandler
      */
     public function shouldReport(Throwable $e)
     {
+        if ($e instanceof GraphQLError && $e->getPrevious() !== null) {
+            $e = $e->getPrevious();
+        }
+    
         if ($e instanceof Error) {
             return $e->shouldReport();
         }
