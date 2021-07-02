@@ -152,7 +152,7 @@ STRING;
                 continue;
             }
 
-            if (!is_subclass_of($parent, $mustImplement)) {
+            if (!is_subclass_of($parent, $mustImplement) && $parent !== $mustImplement) {
                 continue;
             }
 
