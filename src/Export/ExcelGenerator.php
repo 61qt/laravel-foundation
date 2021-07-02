@@ -1,6 +1,6 @@
 <?php
 
-namespace QT\Foundation\Export\Excel;
+namespace QT\Foundation\Export;
 
 use Iterator;
 use QT\Foundation\Model;
@@ -13,7 +13,7 @@ use QT\GraphQL\Options\CursorOption;
 use Box\Spout\Writer\Common\Creator\WriterFactory;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
-class Builder
+class ExcelGenerator
 {
     /**
      * resolver中select的字段
@@ -36,7 +36,6 @@ class Builder
      * @var array
      */
     protected $selectedColumns = [];
-
 
     /**
      * 导出时页码
@@ -72,6 +71,13 @@ class Builder
      * @var int
      */
     protected $reportAt = 0;
+
+    /**
+     * 进度上报回调
+     *
+     * @var callable
+     */
+    protected $reportCallback;
 
     /**
      * Builder Construct
@@ -200,6 +206,18 @@ class Builder
     }
 
     /**
+     * 注册任务进度上报事件
+     *
+     * @param callable $reportCallback
+     */
+    public function registerReportProgressCallback(callable $reportCallback)
+    {
+        $this->reportCallback = $reportCallback;
+
+        return $this;
+    }
+
+    /**
      * 上报导出进度
      *
      * @param int @progress
@@ -209,9 +227,8 @@ class Builder
         // 缓存当前新增进度
         $this->count += $progress;
         // 检查离上次上报时间的间隔
-        if (time() >= $this->reportAt) {
-            // TODO 触发事件
-            // emit('progress', $this->count)
+        if (time() >= $this->reportAt && !empty($this->reportCallback)) {
+            call_user_func($this->reportCallback, $this->count);
 
             $this->count    = 0;
             $this->reportAt = time() + $this->interval;

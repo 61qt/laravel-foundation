@@ -7,6 +7,7 @@ use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ListOfType;
+use QT\Foundation\Export\ExcelGenerator;
 use GraphQL\Type\Definition\Type as BaseType;
 use QT\GraphQL\Definition\ModelType as BaseModelType;
 
@@ -23,6 +24,13 @@ abstract class ModelType extends BaseModelType
      * @var array
      */
     public $canAccess = [];
+
+    /**
+     * 是否启用导出类型
+     *
+     * @var bool
+     */
+    public $useExport = false;
 
     /**
      * 获取model可用字段,允许继承细分可用字段
@@ -132,5 +140,31 @@ abstract class ModelType extends BaseModelType
                 'description' => 'id',
             ],
         ];
+    }
+
+    /**
+     * 获取可导出字段
+     * [
+     *    'id' => '编号',
+     *    'name' => '名称',
+     *    'relation1.name' => '关联1的名称',
+     *    'relation2' => [
+     *        'name' => '关联2的名称', 
+     *    ],
+     * ]
+     *
+     * @return array
+     */
+    public function getExportColumns(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return ExcelGenerator
+     */
+    public function getExportGenerator($selected, $alias, $filters): ExcelGenerator
+    {
+        return new ExcelGenerator($selected, $this->getExportColumns(), $alias, $filters);
     }
 }
