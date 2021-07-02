@@ -101,7 +101,7 @@ abstract class ExportType extends ObjectType implements Resolvable
 
         $resolver = $this->ofType->getResolver();
         $query    = $resolver->getModelQuery();
-        $count    = $resolver->buildFilter($query, $args['filters'])->count();
+        $count    = $resolver->buildFilter($query, $args['filters'] ?? [])->count();
 
         if (isset($resolver->exportLimit)) {
             $maxLimit = $resolver->exportLimit;
