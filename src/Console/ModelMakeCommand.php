@@ -4,6 +4,7 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
 use QT\Foundation\Traits\GeneratorModuleHelper;
 use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
 
@@ -52,7 +53,6 @@ class ModelMakeCommand extends BaseModelMakeCommand
      */
     protected function buildClass($name)
     {
-        $stub    = parent::buildClass($name);
         $table   = Str::plural(Str::snake(class_basename($this->argument('name'))));
         $columns = collect(Schema::getColumnListing($table))
             ->filter(function ($column) {
@@ -64,6 +64,14 @@ class ModelMakeCommand extends BaseModelMakeCommand
                 return str_pad('', 8, ' ', STR_PAD_LEFT) . "'{$column}',";
             });
 
-        return str_replace('DummyColumns', $columns->implode("\r"), $stub);
+        $replace = ['DummyColumns' => $columns->implode("\r")];
+        $replace = $this->buildClassParents($replace, Model::class, [
+            \App\Models\Model::class,
+            \QT\Foundation\Model::class,
+        ]);
+
+        return str_replace(
+            array_keys($replace), array_values($replace), parent::buildClass($name)
+        );
     }
 }

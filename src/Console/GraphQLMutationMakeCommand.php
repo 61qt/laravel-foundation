@@ -4,11 +4,12 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use QT\GraphQL\Definition\ModelMutation;
 use QT\Foundation\Traits\GeneratorModuleHelper;
 
 /**
  * GraphQL mutation 生成脚本
- * 
+ *
  * @package QT\Foundation\Console
  */
 class GraphQLMutationMakeCommand extends GeneratorCommand
@@ -77,11 +78,13 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
             }
         }
 
-        $replace = $this->buildDataStructureReplacements([
-            'DummyObjectName'  => lcfirst($type),
-            'DummyDescription' => $type,
-            'DummyTypeName'    => $type,
-        ], $table);
+        $replace = ['DummyObjectName' => lcfirst($type), 'DummyDescription' => $type, 'DummyTypeName' => $type];
+        $replace = $this->buildDataStructureReplacements($replace, $table);
+        $replace = $this->buildClassParents($replace, ModelMutation::class, [
+            \App\GraphQL\Type\ModelMutation::class,
+            \App\GraphQL\Definition\ModelMutation::class,
+            \QT\GraphQL\Definition\ModelMutation::class,
+        ]);
 
         return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)

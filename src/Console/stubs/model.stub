@@ -2,9 +2,9 @@
 
 namespace DummyNamespace;
 
-use QT\Foundation\Model;
+use DummyParentFullName;
 
-class DummyClass extends Model
+class DummyClass extends DummyParent
 {
     protected $fillable = [
 DummyColumns

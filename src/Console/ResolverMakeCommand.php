@@ -2,6 +2,7 @@
 
 namespace QT\Foundation\Console;
 
+use QT\GraphQL\Resolver;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Doctrine\DBAL\Types\Types;
@@ -98,6 +99,10 @@ class ResolverMakeCommand extends GeneratorCommand
         $table   = Str::plural(Str::snake($model));
         $replace = $this->buildModelReplacements($replace, $model);
         $replace = $this->buildRulesReplacements($replace, $table, explode(',', $rules));
+        $replace = $this->buildClassParents($replace, Resolver::class, [
+            \App\Resolvers\Resolver::class,
+            \QT\GraphQL\Resolver::class,
+        ]);
 
         return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)

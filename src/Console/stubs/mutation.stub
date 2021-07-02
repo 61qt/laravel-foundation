@@ -3,14 +3,14 @@
 namespace DummyNamespace;
 
 use QT\GraphQL\Definition\Type;
-use QT\GraphQL\Definition\ModelMutation;
+use DummyParentFullName;
 
 /**
  * DummyClass
  *
  * @package DummyNamespace
  */
-class DummyClass extends ModelMutation
+class DummyClass extends DummyParent
 {
     /**
      * object type
