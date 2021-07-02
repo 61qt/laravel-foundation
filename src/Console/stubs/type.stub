@@ -6,7 +6,7 @@ use QT\GraphQL\Resolver;
 use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
 use QT\GraphQL\Filters\Registrar;
-use QT\Foundation\GraphQL\Definition\ModelType;
+use DummyParentFullName;
 use DummyResolverClass;
 
 /**
@@ -14,7 +14,7 @@ use DummyResolverClass;
  *
  * @package DummyNamespace
  */
-class DummyClass extends ModelType
+class DummyClass extends DummyParent
 {
     /**
      * GraphQL类型名称

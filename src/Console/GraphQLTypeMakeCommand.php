@@ -4,6 +4,7 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use QT\GraphQL\Definition\ModelType;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Console\GeneratorCommand;
 use QT\Foundation\Traits\GeneratorModuleHelper;
@@ -87,6 +88,11 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         $replace = $this->buildResolverReplacements($replace, $type);
         $replace = $this->buildFilterReplacements($replace, $type);
         $replace = $this->buildDataStructureReplacements($replace, $table);
+        $replace = $this->buildClassParents($replace, ModelType::class, [
+            \App\GraphQL\Type\ModelType::class,
+            \App\GraphQL\Definition\ModelType::class,
+            \QT\Foundation\GraphQL\Definition\ModelType::class,
+        ]);
 
         return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)

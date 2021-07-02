@@ -99,6 +99,8 @@ STRING;
     {
         return array_merge(parent::getOptions(), [
             ['module', null, InputOption::VALUE_OPTIONAL, '指定模块'],
+
+            ['parent_class', null, InputOption::VALUE_OPTIONAL, '指定继承父类'],
         ]);
     }
 
@@ -132,5 +134,32 @@ STRING;
         return array_merge($replace, [
             'DummyDataStructure' => implode("\n", $dataStructure),
         ]);
+    }
+
+    /**
+     * Build class extends parent
+     *
+     * @param  array  $replace
+     * @param  string $table
+     * @return array
+     */
+    protected function buildClassParents(array $replace, string $mustImplement, array $parents)
+    {
+        $parents = array_merge($this->option('parent_class') ?? [], $parents);
+
+        foreach ($parents as $parent) {
+            if (!class_exists($parent)) {
+                continue;
+            }
+
+            if (!is_subclass_of($parent, $mustImplement)) {
+                continue;
+            }
+
+            return array_merge($replace, [
+                'DummyParentFullName' => $parent,
+                'DummyParent'         => class_basename($parent),
+            ]);
+        }
     }
 }
