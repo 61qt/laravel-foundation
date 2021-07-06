@@ -33,6 +33,20 @@ abstract class ModelType extends BaseModelType
     public $useExport = false;
 
     /**
+     * 查询单条记录时的主键名称
+     *
+     * @var string
+     */
+    protected $keyName = 'id';
+
+    /**
+     * 主键类型
+     *
+     * @var string
+     */
+    protected $keyType = 'bigint';
+
+    /**
      * 获取model可用字段,允许继承细分可用字段
      *
      * @return array
@@ -108,19 +122,19 @@ abstract class ModelType extends BaseModelType
 
     /**
      * 如果type有包装,将其包装解除并返回包装回调函数
-     * 
+     *
      * @param Type $type
      * @return array
      */
     protected function unwrap($type)
     {
-        $wrap = function ($type) { return $type; };
+        $wrap = function ($type) {return $type;};
         if ($type instanceof ListOfType) {
             $type = $type->getOfType();
-            $wrap = function ($type) { return Type::listOf($type); };
+            $wrap = function ($type) {return Type::listOf($type);};
         } elseif ($type instanceof NonNull) {
             $type = $type->getOfType();
-            $wrap = function ($type) { return Type::nonNull($type); };
+            $wrap = function ($type) {return Type::nonNull($type);};
         }
 
         return [$type, $wrap];
@@ -135,9 +149,9 @@ abstract class ModelType extends BaseModelType
     public function getArgs(GraphQLManager $manager): array
     {
         return [
-            'id' => [
-                'type'        => Type::bigint(),
-                'description' => 'id',
+            $this->keyName => [
+                'type'        => Type::{$this->keyType}(),
+                'description' => $this->keyName,
             ],
         ];
     }
@@ -149,7 +163,7 @@ abstract class ModelType extends BaseModelType
      *    'name' => '名称',
      *    'relation1.name' => '关联1的名称',
      *    'relation2' => [
-     *        'name' => '关联2的名称', 
+     *        'name' => '关联2的名称',
      *    ],
      * ]
      *
