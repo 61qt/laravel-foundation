@@ -63,7 +63,7 @@ abstract class ExportType extends ObjectType implements Resolvable
     {
         return [
             'exportColumns' => [
-                'type'        => Type::nonNull(Type::listOf(Type::string())),
+                'type'        => Type::listOf(Type::string()),
                 'description' => '导出的字段',
             ],
             'filters'       => [
@@ -97,6 +97,10 @@ abstract class ExportType extends ObjectType implements Resolvable
 
         if ($user === null || !Resource::isAllowExport($user, $context, $this->name)) {
             throw new Error('UNAUTH', '没有导出权限');
+        }
+
+        if (empty($args['exportColumns'])) {
+            throw new Error('FORBIDDEN', '必选选中一个字段进行导出');
         }
 
         $resolver = $this->ofType->getResolver();
