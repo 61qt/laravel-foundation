@@ -95,7 +95,7 @@ abstract class ExportType extends ObjectType implements Resolvable
     {
         $user = $context->getRequest()->user();
 
-        if ($user === null || Resource::isAllowExport($user, $context, $this->name)) {
+        if ($user === null || !Resource::isAllowExport($user, $context, $this->name)) {
             throw new Error('UNAUTH', '没有导出权限');
         }
 
