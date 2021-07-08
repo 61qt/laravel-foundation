@@ -43,22 +43,22 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Determine if the exception should be reported.
+     * Determine if the exception is in the "do not report" list.
      *
      * @param  \Throwable  $e
      * @return bool
      */
-    public function shouldReport(Throwable $e)
+    protected function shouldntReport(Throwable $e)
     {
         if ($e instanceof GraphQLError && $e->getPrevious() !== null) {
-            $e = $e->getPrevious();
+            return $this->shouldntReport($e->getPrevious());
         }
     
         if ($e instanceof Error) {
-            return $e->shouldReport();
+            return !$e->shouldReport();
         }
 
-        return parent::shouldReport($e);
+        return parent::shouldntReport($e);
     }
 
     /**
