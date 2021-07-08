@@ -44,6 +44,25 @@ class Model extends EloquentModel
         self::STATUS_BAN    => '禁用',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::eventBoot();
+
+        static::baseModelBoot();
+    }
+
+    protected static function eventBoot()
+    {
+
+    }
+
+    protected static function baseModelBoot()
+    {
+
+    }
+
     /**
      * @return array
      */
@@ -131,6 +150,38 @@ class Model extends EloquentModel
     }
 
     /**
+     * 流式获取
+     * 
+     * @param @baseQuery
+     * @param @lastId
+     * @param @limit
+     * @return \Generator
+     */
+    public static function getCursor($baseQuery, $lastId = 0, $limit = 1000)
+    {
+        $table   = $baseQuery->getModel()->getTable();
+        $keyName = $baseQuery->getModel()->getKeyName();
+
+        while (true) {
+            $models = (clone $baseQuery)
+                ->where("{$table}.{$keyName}", '>', $lastId)
+                ->orderBy("{$table}.{$keyName}", 'asc')
+                ->limit($limit)
+                ->get();
+
+            if ($models->isEmpty()) {
+                break;
+            }
+
+            foreach ($models as $model) {
+                yield $model;
+            }
+
+            $lastId = $models->last()->{$keyName};
+        }
+    }
+
+    /**
      * model支持直接执行safeDecrement
      *
      * @param array $columns
@@ -153,22 +204,46 @@ class Model extends EloquentModel
         $query->whereKey($this->getKey())->safeDecrement($columns);
     }
 
-    protected static function boot()
+    /**
+     * Get a new query builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function newBaseQueryBuilder()
     {
-        parent::boot();
-
-        static::eventBoot();
-
-        static::baseModelBoot();
+        return $this->bootMacros(parent::newBaseQueryBuilder());
     }
 
-    protected static function eventBoot()
+    /**
+     * 初始化query默认携带的macro方法.
+     *
+     * @param  Builder $query
+     * @return Builder
+     */
+    protected function bootMacros(Builder $query)
     {
+        /**
+         * 减量操作,防止最小值小于0出现越界错误
+         *
+         * @param array $columns
+         */
+        $query->macro('safeDecrement', function ($columns) {
+            $values = [];
+            foreach ($columns as $column => $amount) {
+                if (!is_numeric($amount) || $amount <= 0) {
+                    continue;
+                }
 
-    }
+                $values[$column] = DB::raw("IF(`{$column}` >= {$amount}, `{$column}` - {$amount}, 0)");
+            }
 
-    protected static function baseModelBoot()
-    {
+            if (!empty($values)) {
+                // macro时$this会指向Builder
+                /** @var Builder $this */
+                $this->update($values);
+            }
+        });
 
+        return $query;
     }
 }
