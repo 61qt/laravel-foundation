@@ -201,12 +201,13 @@ class Model extends EloquentModel
      *
      * @param int | string  $wheres
      * @param string $errorMessage
+     * @param array $selects
      *
      * @return mixed
      */
-    public static function findOrError(int | string $primaryId, string $errorMessage = '')
+    public static function findOrError(int | string $primaryId, string $errorMessage = '', array $selects = ['*'])
     {
-        $result = self::query()->find($primaryId);
+        $result = self::query()->select(...$selects)->find($primaryId);
         if ($result === null) {
             throw new Error('VALIDATE_FAILED', $errorMessage ?: '数据不存在');
         }
@@ -219,15 +220,20 @@ class Model extends EloquentModel
      *
      * @param array $wheres
      * @param string $errorMessage
+     * @param array $selects
      *
      * @return mixed
      */
-    public static function firstOrError(array $wheres, string $errorMessage = '')
+    public static function firstOrError(array $wheres, string $errorMessage = '', array $selects = ['*'])
     {
         if (empty($wheres)) {
             throw new Error('VALIDATE_FAILED', '查询条件不存在');
         }
-        $result = self::query()->where($wheres)->first();
+
+        $result = self::query()
+            ->select(...$selects)
+            ->where($wheres)
+            ->first();
         if ($result === null) {
             throw new Error('VALIDATE_FAILED', $errorMessage ?: '数据不存在');
         }
