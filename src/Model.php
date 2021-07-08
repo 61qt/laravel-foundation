@@ -4,6 +4,7 @@ namespace QT\Foundation;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use QT\Foundation\Exceptions\Error;
 use QT\Foundation\Traits\Exportable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
@@ -18,9 +19,9 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
  * @method static static            updateOrCreate(array $attributes, array $values = [])
  * @method static static            firstOrFail($columns = ['*'])
  * @method static static            firstOr($columns = ['*'], Closure $callback = null)
- * 
+ *
  * 通用model
- * 
+ *
  * @package QT\Foundation
  */
 class Model extends EloquentModel
@@ -193,6 +194,45 @@ class Model extends EloquentModel
         });
 
         return $query;
+    }
+
+    /**
+     * 按照主键id读取数据，如果数据不存在报错
+     *
+     * @param int | string  $wheres
+     * @param string $errorMessage
+     *
+     * @return mixed
+     */
+    public static function findOrError(int | string $primaryId, string $errorMessage = '')
+    {
+        $result = self::query()->find($primaryId);
+        if ($result === null) {
+            throw new Error('VALIDATE_FAILED', $errorMessage ?: '数据不存在');
+        }
+
+        return $result;
+    }
+
+    /**
+     *  根据条件读取单条数据，如果数据不存在报错
+     *
+     * @param array $wheres
+     * @param string $errorMessage
+     *
+     * @return mixed
+     */
+    public static function firstOrError(array $wheres, string $errorMessage = '')
+    {
+        if (empty($wheres)) {
+            throw new Error('VALIDATE_FAILED', '查询条件不存在');
+        }
+        $result = self::query()->where($wheres)->first();
+        if ($result === null) {
+            throw new Error('VALIDATE_FAILED', $errorMessage ?: '数据不存在');
+        }
+
+        return $result;
     }
 
     protected static function boot()
