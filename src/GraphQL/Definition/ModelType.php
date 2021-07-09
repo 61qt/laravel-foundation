@@ -67,9 +67,10 @@ abstract class ModelType extends BaseModelType
      *
      * @param array $fields
      * @param array $canAccess
+     * @param string $prefix
      * @return array
      */
-    protected function defineAccessFields(array $fields, array $canAccess)
+    protected function defineAccessFields(array $fields, array $canAccess, string $prefix = '')
     {
         if (isset($canAccess['*'])) {
             // 允许全部字段访问时,根据可访问字段构建
@@ -102,15 +103,16 @@ abstract class ModelType extends BaseModelType
                 continue;
             }
 
+            $prefix = "{$prefix}_{$this->name}";
             // 根据配置生成可访问字段
-            $func = function () use ($type, $child) {
+            $func = function () use ($type, $child, $prefix) {
                 return $this->defineAccessFields(
-                    $type->getDataStructure($this->manager), $child
+                    $type->getDataStructure($this->manager), $child, $prefix
                 );
             };
 
             $results[$field] = $wrap($this->manager->create(
-                Str::camel("{$this->name}_{$field}_object"), $func
+                Str::camel("{$prefix}_{$field}"), $func
             ));
         }
 
