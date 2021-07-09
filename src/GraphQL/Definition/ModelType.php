@@ -103,16 +103,17 @@ abstract class ModelType extends BaseModelType
                 continue;
             }
 
-            $prefix = "{$prefix}_{$this->name}";
             // 根据配置生成可访问字段
             $func = function () use ($type, $child, $prefix) {
                 return $this->defineAccessFields(
-                    $type->getDataStructure($this->manager), $child, $prefix
+                    $type->getDataStructure($this->manager), 
+                    $child, 
+                    "{$prefix}_{$this->name}"
                 );
             };
 
             $results[$field] = $wrap($this->manager->create(
-                Str::camel("{$prefix}_{$field}"), $func
+                Str::camel("{$prefix}_{$this->name}_{$field}"), $func
             ));
         }
 
