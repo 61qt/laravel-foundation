@@ -5,6 +5,7 @@
     "require": {
         "php": "^8.0.0",
         "61qt/laravel-graphql": "^v0.36",
+        "61qt/laravel-filesystem": "^v0.1",
         "laravel/framework": "^8.0",
         "doctrine/dbal": "^2.6|^3.0",
         "61qt/import": "^v1.15",
