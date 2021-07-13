@@ -3,7 +3,7 @@
 namespace QT\Foundation\Auth;
 
 use QT\GraphQL\Contracts\Context;
-use QT\Foundation\Auth\GraphQLAuthenticatable;
+use QT\Foundation\Contracts\GraphQLAuthenticatable;
 
 class Resource
 {

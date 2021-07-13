@@ -11,6 +11,7 @@ use QT\Foundation\Traits\SingleSignOn;
 use QT\Foundation\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
+use QT\Foundation\Contracts\GraphQLAuthenticatable;
 
 class JWTGuard implements Guard, StatefulGuard
 {

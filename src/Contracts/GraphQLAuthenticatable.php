@@ -1,5 +1,6 @@
 <?php
-namespace QT\Foundation\Auth;
+
+namespace QT\Foundation\Contracts;
 
 use QT\GraphQL\Contracts\Context;
 
