@@ -22,7 +22,7 @@ class DummyClass extends DummyParent
     /**
      * 添加和修改所有字段信息
      *
-     * @return void
+     * @return array
      */
     public function args(): array
     {
@@ -34,7 +34,7 @@ DummyDataStructure
     /**
      * 新增和查询的方法对应参数设置
      *
-     * @return void
+     * @return array
      */
     public function getMutationArgs(): array
     {
