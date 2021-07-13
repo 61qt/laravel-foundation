@@ -2,7 +2,7 @@
 namespace QT\Foundation\Auth;
 
 use RuntimeException;
-use App\Contracts\JWTSubject;
+use QT\Foundation\Contracts\JWTSubject;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
