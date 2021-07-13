@@ -8,7 +8,7 @@
         "61qt/laravel-filesystem": "^v0.13",
         "laravel/framework": "^8.0",
         "doctrine/dbal": "^2.6|^3.0",
-        "61qt/import": "^v1.15",
+        "61qt/import": "^v1.16",
         "guzzlehttp/guzzle": "^7.3"
     },
     "autoload": {
