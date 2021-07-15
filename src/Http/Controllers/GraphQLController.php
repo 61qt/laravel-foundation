@@ -54,7 +54,7 @@ class GraphQLController
             throw new Error('NOT_FOUND', "{$module}模块不存在");
         }
 
-        $this->namespaces[] = "{$config['namespace']}\\GraphQL";
+        array_unshift($this->namespaces, "{$config['namespace']}\\GraphQL");
 
         // 允许模块自定义鉴权方式
         if (!empty($config['guard'])) {
@@ -130,12 +130,12 @@ class GraphQLController
         foreach ($this->namespaces as $namespace) {
             $type = sprintf('%s\\%s\\%s', $namespace, $space, ucfirst($name));
 
-            if (!class_exists($type)) {
-                throw new RuntimeException("{$type} Class Not Found");
+            if (class_exists($type)) {
+                return app($type, compact('manager'));
             }
-
-            return app($type, compact('manager'));
         }
+
+        throw new RuntimeException("{$type} Class Not Found");
     }
 
     /**
