@@ -54,15 +54,15 @@ class GraphQLController
             throw new Error('NOT_FOUND', "{$module}模块不存在");
         }
 
-        $config  = array_merge(config('graphql'), $config->get('graphql', []));
-        $context = new Context($request, new Response, $config);
+        $this->namespaces[] = "{$config['namespace']}\\GraphQL";
 
         // 允许模块自定义鉴权方式
         if (!empty($config['guard'])) {
             Auth::shouldUse($config['guard']);
         }
 
-        $this->namespaces[] = "{$config['namespace']}\\GraphQL";
+        $config  = array_merge(config('graphql'), $config->get('graphql', []));
+        $context = new Context($request, new Response, $config);
 
         return $context->response->setContent($this->resolveGraphQL(
             $context, $this->getSchemaConfig($context->getValue('schema'), $context)

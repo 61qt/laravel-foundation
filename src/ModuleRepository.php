@@ -53,9 +53,9 @@ class ModuleRepository
             $path = $file->getPathname();
             $name = mb_strtolower($file->getFilename());
 
-            $configFile = "{$path}/{$configFile}";
-            if (file_exists($configFile)) {
-                $config = require $configFile;
+            $configPath = "{$path}/{$configFile}";
+            if (file_exists($configPath)) {
+                $config = require $configPath;
             } else {
                 $config = ['name' => $name];
             }
