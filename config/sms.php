@@ -29,9 +29,9 @@ return [
         ],
         // 阿里大鱼
         'aliyun'   => [
-            'app_key'   => env('ALIYUN_SMS_KEY'),
-            'secret'    => env('ALIYUN_SMS_SECRET'),
-            'sign_name' => env('ALIYUN_SMS_SIGN'),
+            'access_key_id'     => env('ALIYUN_SMS_KEY'),
+            'access_key_secret' => env('ALIYUN_SMS_SECRET'),
+            'sign_name'         => env('ALIYUN_SMS_SIGN'),
         ],
     ],
 ];
