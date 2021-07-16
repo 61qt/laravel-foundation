@@ -38,6 +38,7 @@ trait Enumerable
         $results = [];
         $reflect = new ReflectionClass(static::class);
         foreach (static::$enums as $field) {
+            $value  = [];
             $column = Str::camel($field);
             $name   = Str::camel("{$field}_maps");
 
