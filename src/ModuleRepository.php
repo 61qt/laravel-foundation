@@ -24,6 +24,14 @@ class ModuleRepository
     }
 
     /**
+     * @return array
+     */
+    public function modules(): array
+    {
+        return $this->modules;
+    }
+
+    /**
      * @param string $key
      * @param mixed $default
      * @return Collection
