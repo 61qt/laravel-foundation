@@ -61,7 +61,7 @@ class GraphQLController
             Auth::shouldUse($config['guard']);
         }
 
-        $config  = array_merge(config('graphql'), $config->get('graphql', []));
+        $config  = array_merge_recursive(config('graphql'), $config->get('graphql', []));
         $context = new Context($request, new Response, $config);
 
         return $context->response->setContent($this->resolveGraphQL(
