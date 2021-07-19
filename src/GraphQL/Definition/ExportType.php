@@ -110,7 +110,7 @@ abstract class ExportType extends ObjectType implements Resolvable
         if (isset($resolver->exportLimit)) {
             $maxLimit = $resolver->exportLimit;
         } else {
-            $maxLimit = config('graphql.export_limit');
+            $maxLimit = $context->getValue('graphql.export_limit');
         }
 
         if ($count == 0) {

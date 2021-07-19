@@ -34,7 +34,7 @@ class GraphQLController
         $context = new Context($request, new Response, config('graphql'));
 
         return $context->response->setContent($this->resolveGraphQL(
-            $context, $this->getSchemaConfig($context->getValue('schema'), $context)
+            $context, $this->getSchemaConfig($context->getValue('graphql.schema'), $context)
         ));
     }
 
@@ -61,11 +61,11 @@ class GraphQLController
             Auth::shouldUse($config['guard']);
         }
 
-        $config  = array_merge_recursive(config('graphql'), $config->get('graphql', []));
-        $context = new Context($request, new Response, $config);
+        $config  = $config->mergeRecursive(['graphql' => config('graphql')]);
+        $context = new Context($request, new Response, $config->toArray());
 
         return $context->response->setContent($this->resolveGraphQL(
-            $context, $this->getSchemaConfig($context->getValue('schema'), $context)
+            $context, $this->getSchemaConfig($context->getValue('graphql.schema'), $context)
         ));
     }
 
@@ -174,9 +174,9 @@ class GraphQLController
     protected function getGraphQlRules(Context $context)
     {
         return [
-            new QueryDepth($context->getValue('max_depth')),
-            new QueryComplexity($context->getValue('complexity')),
-            new DisableIntrospection($context->getValue('introspection', 0)),
+            new QueryDepth($context->getValue('graphql.max_depth')),
+            new QueryComplexity($context->getValue('graphql.complexity')),
+            new DisableIntrospection($context->getValue('graphql.introspection', 0)),
         ];
     }
 }
