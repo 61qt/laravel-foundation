@@ -8,7 +8,7 @@ use QT\Foundation\Console\ModelMakeCommand;
 use QT\Foundation\Console\ResolverMakeCommand;
 use QT\Foundation\Console\ImportTaskMakeCommand;
 use QT\Foundation\Console\GraphQLTypeMakeCommand;
-use QT\Foundation\Console\GraphQlMutationMakeCommand;
+use QT\Foundation\Console\GraphQLMutationMakeCommand;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
@@ -40,7 +40,7 @@ class ServiceProvider extends BaseServiceProvider
             ResolverMakeCommand::class,
             ImportTaskMakeCommand::class,
             GraphQLTypeMakeCommand::class,
-            GraphQlMutationMakeCommand::class,
+            GraphQLMutationMakeCommand::class,
         ]);
     }
 }
