@@ -31,7 +31,7 @@ class GraphQLController
      */
     public function graphql(Request $request)
     {
-        $context = new Context($request, new Response, config('graphql'));
+        $context = new Context($request, new Response, ['graphql' => config('graphql')]);
 
         return $context->response->setContent($this->resolveGraphQL(
             $context, $this->getSchemaConfig($context->getValue('graphql.schema'), $context)
