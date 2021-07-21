@@ -16,6 +16,9 @@ class SchemaConfig extends BaseSchemaConfig
         if (!empty($options['mutation'])) {
             $options['mutation'] = static::createMutation($manager, $options['mutation'], ['*' => true]);
         }
+        if (!empty($options['typeLoader'])) {
+            $options['typeLoader'] = [$manager, 'getType'];
+        }
 
         return static::create($options);
     }
@@ -27,6 +30,9 @@ class SchemaConfig extends BaseSchemaConfig
         }
         if (!empty($options['mutation'])) {
             $options['mutation'] = static::createMutation($manager, $options['mutation'], $resources);
+        }
+        if (!empty($options['typeLoader'])) {
+            $options['typeLoader'] = [$manager, 'getType'];
         }
 
         return static::create($options);
