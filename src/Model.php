@@ -4,21 +4,23 @@ namespace QT\Foundation;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use QT\Foundation\Exceptions\Error;
 use QT\Foundation\Traits\Exportable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 /**
- * @method static static|Collection find($id, $columns = ['*'])
  * @method static Collection        findMany($id, $columns = ['*'])
+ * @method static static|Collection find($id, $columns = ['*'])
  * @method static static|Collection findOrFail($id, $columns = ['*'])
+ * @method static static|Collection findOrError($id, $errorMessage = '')
  * @method static static            findOrNew($id, $columns = ['*'])
  * @method static static            firstOrNew(array $attributes, array $values = [])
  * @method static static            firstOrCreate(array $attributes, array $values = [])
  * @method static static            updateOrCreate(array $attributes, array $values = [])
+ * @method static static            first($columns = ['*'])
  * @method static static            firstOrFail($columns = ['*'])
  * @method static static            firstOr($columns = ['*'], Closure $callback = null)
+ * @method static static            firstOrError($errorMessage = '')
  *
  * 通用model
  *
