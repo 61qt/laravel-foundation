@@ -2,8 +2,9 @@
 
 namespace QT\Foundation\Providers;
 
-use RuntimeException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use QT\Foundation\Exceptions\Error;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -45,14 +46,15 @@ class BuilderServiceProvider extends ServiceProvider
         /**
          * 按照主键id读取数据，如果数据不存在报错
          *
-         * @param int | string $primaryId
+         * @param int | string $id
          * @param string $errorMessage
          */
-        EloquentBuilder::macro('findOrError', function ($primaryId, $errorMessage = '数据不存在') {
+        EloquentBuilder::macro('findOrError', function ($id, $errorMessage = '数据不存在') {
             /** @var EloquentBuilder $this */
-            $model = $this->find($primaryId);
-            if ($model === null) {
-                throw new RuntimeException($errorMessage);
+            $model = $this->find($id);
+
+            if ($model === null || ($model instanceof Collection && $model->isEmpty())) {
+                throw new Error('NOT_FOUND', $errorMessage);
             }
 
             return $model;
@@ -66,8 +68,9 @@ class BuilderServiceProvider extends ServiceProvider
         EloquentBuilder::macro('firstOrError', function ($errorMessage = '数据不存在') {
             /** @var EloquentBuilder $this */
             $model = $this->first();
+
             if ($model === null) {
-                throw new RuntimeException($errorMessage);
+                throw new Error('NOT_FOUND', $errorMessage);
             }
 
             return $model;
