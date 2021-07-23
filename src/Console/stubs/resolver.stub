@@ -38,7 +38,8 @@ DummyRules
     /**
      * 新增一条DummyModelClass
      *
-     * @param $id
+     * @param Context $context
+     * @param array $input
      * @return DummyModelClass
      * @throws \Exception
      */
@@ -50,7 +51,8 @@ DummyRules
     /**
      * 修改DummyModelClass
      *
-     * @param $input
+     * @param Context $context
+     * @param array $input
      * @return DummyModelClass
      * @throws \Exception
      */
@@ -62,7 +64,8 @@ DummyRules
     /**
      * 删除DummyModelClass
      *
-     * @param $input
+     * @param Context $context
+     * @param array $input
      * @return DummyModelClass
      * @throws \Exception
      */
