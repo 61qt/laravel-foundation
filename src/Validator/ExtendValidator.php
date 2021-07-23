@@ -7,6 +7,7 @@ class ExtendValidator
 {
     public function phoneNumber($attribute, $value, $params, $validator)
     {
+        $value = intval($value);
         return $value >= 13000000000 && $value <= 19999999999;
     }
 
