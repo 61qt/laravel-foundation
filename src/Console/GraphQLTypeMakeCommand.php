@@ -82,7 +82,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $type  = str_replace($this->getNamespace($name).'\\', '', $name);
-        $table = Str::plural(Str::snake($type));
+        $table = Str::snake(Str::pluralStudly($type));
 
         $replace = ['DummyObjectName' => lcfirst($type), 'DummyDescription' => $type];
         $replace = $this->buildResolverReplacements($replace, $type);

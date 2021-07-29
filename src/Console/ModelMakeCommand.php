@@ -53,7 +53,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
      */
     protected function buildClass($name)
     {
-        $table   = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table   = Str::snake(Str::pluralStudly($this->argument('name')));
         $columns = collect(Schema::getColumnListing($table))
             ->filter(function ($column) {
                 return !in_array($column, [
@@ -64,7 +64,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
                 return str_pad('', 8, ' ', STR_PAD_LEFT) . "'{$column}',";
             });
 
-        $replace = ['DummyColumns' => $columns->implode("\r")];
+        $replace = ['DummyColumns' => $columns->implode("\r"), 'DummyTable' => $table];
         $replace = $this->buildClassParents($replace, Model::class, [
             \App\Models\Model::class,
             \QT\Foundation\Model::class,

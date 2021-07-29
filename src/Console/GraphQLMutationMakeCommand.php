@@ -69,7 +69,7 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
         // 根据Mutation的名称获取Model名
         $class     = str_replace($this->getNamespace($name) . '\\', '', $name);
         $type      = str_replace('Mutation', '', $class);
-        $table     = Str::plural(Str::snake($type));
+        $table     = Str::snake(Str::pluralStudly($type));
         $typeClass = $this->rootNamespace($name) . 'GraphQL\\Type\\' . $type;
 
         if (!class_exists($typeClass)) {

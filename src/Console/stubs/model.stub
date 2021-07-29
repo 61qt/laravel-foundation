@@ -6,6 +6,8 @@ use DummyParentFullName;
 
 class DummyClass extends DummyParent
 {
+    protected $table = 'DummyTable';
+
     protected $fillable = [
 DummyColumns
     ];

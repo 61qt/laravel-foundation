@@ -96,7 +96,7 @@ class ResolverMakeCommand extends GeneratorCommand
             $model = str_replace('Resolver', '', $class);
         }
 
-        $table   = Str::plural(Str::snake($model));
+        $table   = Str::snake(Str::pluralStudly($model));
         $replace = $this->buildModelReplacements($replace, $model);
         $replace = $this->buildRulesReplacements($replace, $table, explode(',', $rules));
         $replace = $this->buildClassParents($replace, Resolver::class, [
