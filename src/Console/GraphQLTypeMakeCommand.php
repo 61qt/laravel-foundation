@@ -46,12 +46,26 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      * @var array
      */
     protected $filterMaps = [
-        Types::INTEGER  => 'int',
-        Types::SMALLINT => 'int',
-        Types::BOOLEAN  => 'int',
-        Types::BIGINT   => 'bigint',
-        Types::STRING   => 'string',
-        Types::TEXT     => 'string',
+        Types::INTEGER              => 'int',
+        Types::SMALLINT             => 'int',
+        Types::BOOLEAN              => 'int',
+        Types::BIGINT               => 'bigint',
+        Types::FLOAT                => 'float',
+        Types::STRING               => 'string',
+        Types::TEXT                 => 'string',
+        Types::ASCII_STRING         => 'string',
+        Types::ARRAY                => 'json',
+        Types::JSON                 => 'json',
+        Types::SIMPLE_ARRAY         => 'json',
+        Types::OBJECT               => 'json',
+        Types::DATETIME_MUTABLE     => 'timestamp',
+        Types::DATE_MUTABLE         => 'timestamp',
+        Types::DATE_IMMUTABLE       => 'timestamp',
+        Types::DATEINTERVAL         => 'timestamp',
+        Types::DATETIME_MUTABLE     => 'timestamp',
+        Types::DATETIME_IMMUTABLE   => 'timestamp',
+        Types::DATETIMETZ_MUTABLE   => 'timestamp',
+        Types::DATETIMETZ_IMMUTABLE => 'timestamp',
     ];
 
     /**
