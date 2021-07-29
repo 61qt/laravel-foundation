@@ -22,14 +22,26 @@ trait GeneratorModuleHelper
      * @var array
      */
     protected $typeMaps = [
-        Types::INTEGER      => 'Type::int()',
-        Types::SMALLINT     => 'Type::int()',
-        Types::BOOLEAN      => 'Type::int()',
-        Types::STRING       => 'Type::string()',
-        Types::TEXT         => 'Type::string()',
-        Types::BIGINT       => 'Type::bigint()',
-        Types::DATE_MUTABLE => 'Type::timestamp()',
-        Types::JSON         => 'Type::json()',
+        Types::INTEGER              => 'Type::int()',
+        Types::SMALLINT             => 'Type::int()',
+        Types::BOOLEAN              => 'Type::int()',
+        Types::BIGINT               => 'Type::bigint()',
+        Types::FLOAT                => 'Type::float()',
+        Types::STRING               => 'Type::string()',
+        Types::TEXT                 => 'Type::string()',
+        Types::ASCII_STRING         => 'Type::string()',
+        Types::ARRAY                => 'Type::json()',
+        Types::JSON                 => 'Type::json()',
+        Types::SIMPLE_ARRAY         => 'Type::json()',
+        Types::OBJECT               => 'Type::json()',
+        Types::DATETIME_MUTABLE     => 'Type::timestamp()',
+        Types::DATE_MUTABLE         => 'Type::timestamp()',
+        Types::DATE_IMMUTABLE       => 'Type::timestamp()',
+        Types::DATEINTERVAL         => 'Type::timestamp()',
+        Types::DATETIME_MUTABLE     => 'Type::timestamp()',
+        Types::DATETIME_IMMUTABLE   => 'Type::timestamp()',
+        Types::DATETIMETZ_MUTABLE   => 'Type::timestamp()',
+        Types::DATETIMETZ_IMMUTABLE => 'Type::timestamp()',
     ];
 
     /**

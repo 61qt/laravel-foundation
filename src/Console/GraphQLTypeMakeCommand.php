@@ -46,26 +46,20 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      * @var array
      */
     protected $filterMaps = [
-        Types::INTEGER              => 'int',
-        Types::SMALLINT             => 'int',
-        Types::BOOLEAN              => 'int',
-        Types::BIGINT               => 'bigint',
-        Types::FLOAT                => 'float',
-        Types::STRING               => 'string',
-        Types::TEXT                 => 'string',
-        Types::ASCII_STRING         => 'string',
-        Types::ARRAY                => 'json',
-        Types::JSON                 => 'json',
-        Types::SIMPLE_ARRAY         => 'json',
-        Types::OBJECT               => 'json',
-        Types::DATETIME_MUTABLE     => 'timestamp',
-        Types::DATE_MUTABLE         => 'timestamp',
-        Types::DATE_IMMUTABLE       => 'timestamp',
-        Types::DATEINTERVAL         => 'timestamp',
-        Types::DATETIME_MUTABLE     => 'timestamp',
-        Types::DATETIME_IMMUTABLE   => 'timestamp',
-        Types::DATETIMETZ_MUTABLE   => 'timestamp',
-        Types::DATETIMETZ_IMMUTABLE => 'timestamp',
+        Types::INTEGER      => 'int',
+        Types::SMALLINT     => 'int',
+        Types::BOOLEAN      => 'int',
+        Types::BIGINT       => 'bigint',
+        Types::STRING       => 'string',
+        Types::TEXT         => 'string',
+        Types::ASCII_STRING => 'string',
+    ];
+
+    /**
+     * @var array
+     */
+    protected $likeFields = [
+        'name',
     ];
 
     /**
@@ -149,10 +143,10 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         $schema = Schema::getConnection()->getDoctrineSchemaManager();
         $table  = $schema->listTableDetails($table);
 
-        $func = function ($filters, $column, $type) {
+        $func = function ($filters, $column, $type, $operators) {
             $name   = $column->getName();
             $method = $this->filterMaps[$type];
-            $filter = "->{$method}('{$name}', ['=', 'in'])";
+            $filter = "->{$method}('{$name}', {$operators})";
 
             $filters[$name] = str_pad('', 12, ' ', STR_PAD_LEFT) . $filter;
         };
@@ -160,13 +154,23 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         // 根据字典生成默认筛选条件
         $filters = collect();
         foreach ($table->getColumns() as $column) {
-            $type = $column->getType()->getName();
+            $operators = null;
+            $type      = $column->getType()->getName();
+            if ($type === Types::BOOLEAN) {
+                $operators = "['=', 'in', '!=']";
+            }
 
-            if ($type !== Types::BOOLEAN) {
+            foreach ($this->likeFields as $field) {
+                if (Str::contains($column->getName(), $field)) {
+                    $operators = "['like']";
+                }
+            }
+
+            if (empty($operators)) {
                 continue;
             }
 
-            $func($filters, $column, $type);
+            $func($filters, $column, $type, $operators);
         }
 
         // 根据索引生成默认筛选条件
@@ -179,7 +183,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
                     continue;
                 }
 
-                $func($filters, $column, $type);
+                $func($filters, $column, $type, "['=', 'in']");
             }
         }
 
