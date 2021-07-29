@@ -4,6 +4,7 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Doctrine\DBAL\Types\Types;
 use QT\GraphQL\Definition\ModelType;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Console\GeneratorCommand;
@@ -11,7 +12,7 @@ use QT\Foundation\Traits\GeneratorModuleHelper;
 
 /**
  * GraphQL type 生成脚本
- * 
+ *
  * @package QT\Foundation\Console
  */
 class GraphQLTypeMakeCommand extends GeneratorCommand
@@ -41,15 +42,16 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
 
     /**
      * 数据库类型跟筛选类型的映射
-     * 
+     *
      * @var array
      */
     protected $filterMaps = [
-        'integer'  => 'int',
-        'smallint' => 'int',
-        'bigint'   => 'bigint',
-        'string'   => 'string',
-        'text'     => 'string',
+        Types::INTEGER  => 'int',
+        Types::SMALLINT => 'int',
+        Types::BOOLEAN  => 'int',
+        Types::BIGINT   => 'bigint',
+        Types::STRING   => 'string',
+        Types::TEXT     => 'string',
     ];
 
     /**
@@ -59,7 +61,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/type.stub';
+        return __DIR__ . '/stubs/type.stub';
     }
 
     /**
@@ -81,7 +83,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $type  = str_replace($this->getNamespace($name).'\\', '', $name);
+        $type  = str_replace($this->getNamespace($name) . '\\', '', $name);
         $table = Str::snake(Str::pluralStudly($type));
 
         $replace = ['DummyObjectName' => lcfirst($type), 'DummyDescription' => $type];
@@ -110,7 +112,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     {
         $resolverClass = $this->parseType($type);
 
-        if (! class_exists($resolverClass)) {
+        if (!class_exists($resolverClass)) {
             if ($this->confirm("{$resolverClass} 不存在. 是否要生成?", true)) {
                 $this->call('make:graphql-resolver', ['name' => "{$type}Resolver", '--module' => $this->option('module')]);
             }
@@ -130,28 +132,41 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      */
     protected function buildFilterReplacements(array $replace, $table)
     {
-        $schema  = Schema::getConnection()->getDoctrineSchemaManager();
-        $columns = [];
-        foreach ($schema->listTableIndexes($table) as $index) {
-            $columns = array_merge($columns, $index->getColumns());
-        }
+        $schema = Schema::getConnection()->getDoctrineSchemaManager();
+        $table  = $schema->listTableDetails($table);
 
-        $filters = [];
-        $columns = collect(array_unique($columns));
-        foreach ($columns as $column) {
-            $column = Schema::getConnection()->getDoctrineColumn($table, $column);
-    
-            $type = $column->getType()->getName();
-    
-            if (empty($this->filterMaps[$type])) {
-                continue;
-            }
-    
+        $func = function ($filters, $column, $type) {
             $name   = $column->getName();
             $method = $this->filterMaps[$type];
             $filter = "->{$method}('{$name}', ['=', 'in'])";
 
-            $filters[] = str_pad('', 12, ' ', STR_PAD_LEFT).$filter;
+            $filters[$name] = str_pad('', 12, ' ', STR_PAD_LEFT) . $filter;
+        };
+
+        // 根据字典生成默认筛选条件
+        $filters = collect();
+        foreach ($table->getColumns() as $column) {
+            $type = $column->getType()->getName();
+
+            if ($type !== Types::BOOLEAN) {
+                continue;
+            }
+
+            $func($filters, $column, $type);
+        }
+
+        // 根据索引生成默认筛选条件
+        foreach ($table->getIndexes() as $index) {
+            foreach ($index->getColumns() as $column) {
+                $column = $table->getColumn($column);
+                $type   = $column->getType()->getName();
+
+                if (empty($this->filterMaps[$type])) {
+                    continue;
+                }
+
+                $func($filters, $column, $type);
+            }
         }
 
         if (empty($filters)) {
@@ -160,7 +175,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
             $filters = sprintf(
                 "%s\$registrar\n%s;",
                 str_pad('', 8, ' ', STR_PAD_LEFT),
-                implode("\n", $filters),
+                $filters->implode("\n"),
             );
         }
 
@@ -179,11 +194,11 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
             throw new InvalidArgumentException('Model name contains invalid characters.');
         }
 
-        $resolver    = trim(str_replace('/', '\\', $type), '\\').'Resolver';
-        $rootNamespace = $this->rootNamespace().'Resolvers\\';
+        $resolver      = trim(str_replace('/', '\\', $type), '\\') . 'Resolver';
+        $rootNamespace = $this->rootNamespace() . 'Resolvers\\';
 
-        if (! Str::startsWith($resolver, $rootNamespace)) {
-            $resolver = $rootNamespace.$resolver;
+        if (!Str::startsWith($resolver, $rootNamespace)) {
+            $resolver = $rootNamespace . $resolver;
         }
 
         return $resolver;
