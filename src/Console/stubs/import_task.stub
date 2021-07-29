@@ -16,7 +16,7 @@ class DummyClass extends Task
      *
      * @var string
      */
-    protected $model = '';
+    protected $model;
 
     /**
      * 导入字段.

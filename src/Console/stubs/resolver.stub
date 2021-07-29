@@ -32,7 +32,7 @@ DummyRules
      */
     public function getModel()
     {
-        return new DummyModelClass;
+        return new DummyModelClass();
     }
 
     /**

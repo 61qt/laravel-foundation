@@ -58,7 +58,7 @@ class DummyClass extends DummyParent
      */
     public function getResolver(): Resolver
     {
-        return new DummyResolver;
+        return new DummyResolver();
     }
 
     /**
