@@ -86,7 +86,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
 
         $replace = ['DummyObjectName' => lcfirst($type), 'DummyDescription' => $type];
         $replace = $this->buildResolverReplacements($replace, $type);
-        $replace = $this->buildFilterReplacements($replace, $type);
+        $replace = $this->buildFilterReplacements($replace, $table);
         $replace = $this->buildDataStructureReplacements($replace, $table);
         $replace = $this->buildClassParents($replace, ModelType::class, [
             \App\GraphQL\Type\ModelType::class,
