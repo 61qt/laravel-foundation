@@ -80,6 +80,18 @@ class ExtendValidator
         return preg_match('/^[\pL\pM\pN\/]+$/u', $value) === 1;
     }
 
+    // 密码
+    public function password($attribute, $value, $params, $validator)
+    {
+        return preg_match('/^[0-9a-zA-Z\d\x!$#%]+$/', $value) === 1;
+    }
+
+    // 严格密码,至少需要满足3种格式,单词大小写,1-9,符号(!,$,#,%),Unicode字符
+    public function strictPassword($attribute, $value, $params, $validator)
+    {
+        return preg_match('/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/', $value) === 1;
+    }
+
     public function isChinese($attribute, $value, $params, $validator)
     {
         return preg_match("/^[\x{4e00}-\x{9fa5}]+$/u", $value) === 1;
