@@ -4,7 +4,6 @@ namespace QT\Foundation\Http\Controllers;
 
 use Error;
 use GraphQL\GraphQL;
-use RuntimeException;
 use GraphQL\Type\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
