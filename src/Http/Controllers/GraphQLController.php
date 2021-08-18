@@ -12,6 +12,7 @@ use QT\GraphQL\GraphQLManager;
 use QT\Foundation\Http\Context;
 use QT\Foundation\ModuleRepository;
 use Illuminate\Support\Facades\Auth;
+use QT\Foundation\GraphQL\TypeFinder;
 use GraphQL\Validator\Rules\QueryDepth;
 use QT\Foundation\GraphQL\SchemaConfig;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -19,10 +20,6 @@ use GraphQL\Validator\Rules\DisableIntrospection;
 
 class GraphQLController
 {
-    protected $namespaces = [
-        "App\\GraphQL",
-    ];
-
     /**
      * 无模块graphql请求
      *
@@ -53,8 +50,6 @@ class GraphQLController
         if (empty($config)) {
             throw new Error('NOT_FOUND', "{$module}模块不存在");
         }
-
-        array_unshift($this->namespaces, "{$config['namespace']}\\GraphQL");
 
         // 允许模块自定义鉴权方式
         if (!empty($config['guard'])) {
@@ -109,33 +104,14 @@ class GraphQLController
     /**
      * 获取graphql type管理工具
      *
+     * @param array $config
      * @return GraphQLManager
      */
-    protected function getGraphQLManager(): GraphQLManager
+    protected function getGraphQLManager(array $config): GraphQLManager
     {
-        return tap(new GraphQLManager, function ($manager) {
-            $manager->setTypeFinder([$this, 'loadType']);
+        return tap(new GraphQLManager, function ($manager) use ($config) {
+            $manager->setTypeFinder(new TypeFinder($config));
         });
-    }
-
-    /**
-     * GraphQLManager文件查询回调
-     *
-     * @param string $name
-     * @param string $space
-     * @param GraphQLManager $manager
-     */
-    public function loadType($name, $space, GraphQLManager $manager)
-    {
-        foreach ($this->namespaces as $namespace) {
-            $type = sprintf('%s\\%s\\%s', $namespace, $space, ucfirst($name));
-
-            if (class_exists($type)) {
-                return app($type, compact('manager'));
-            }
-        }
-
-        throw new RuntimeException("{$type} Class Not Found");
     }
 
     /**
@@ -150,8 +126,8 @@ class GraphQLController
         $resources = $context->getValue('resources', []);
 
         return $context->has('resources') && !empty($resources)
-            ? SchemaConfig::rbac($this->getGraphQLManager(), $config, $resources)
-            : SchemaConfig::make($this->getGraphQLManager(), $config);
+            ? SchemaConfig::rbac($this->getGraphQLManager($config), $config, $resources)
+            : SchemaConfig::make($this->getGraphQLManager($config), $config);
     }
 
     /**
