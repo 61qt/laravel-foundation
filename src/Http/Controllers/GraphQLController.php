@@ -28,10 +28,11 @@ class GraphQLController
      */
     public function graphql(Request $request)
     {
-        $context = new Context($request, new Response, ['graphql' => config('graphql')]);
+        $config  = config('graphql');
+        $context = new Context($request, new Response, ['graphql' => $config]);
 
         return $context->response->setContent($this->resolveGraphQL(
-            $context, $this->getSchemaConfig($context->getValue('graphql.schema'), $context)
+            $context, $this->getSchemaConfig($config, $context)
         ));
     }
 
@@ -56,11 +57,11 @@ class GraphQLController
             Auth::shouldUse($config['guard']);
         }
 
-        $config  = $config->mergeRecursive(['graphql' => config('graphql')]);
-        $context = new Context($request, new Response, $config->toArray());
+        $config  = $config->mergeRecursive(['graphql' => config('graphql')])->toArray();
+        $context = new Context($request, new Response, $config);
 
         return $context->response->setContent($this->resolveGraphQL(
-            $context, $this->getSchemaConfig($context->getValue('graphql.schema'), $context)
+            $context, $this->getSchemaConfig($config, $context)
         ));
     }
 
@@ -117,6 +118,7 @@ class GraphQLController
     /**
      * 获取Schema config
      *
+     * @param array $config
      * @param Context $context
      * @return SchemaConfig
      */
@@ -124,10 +126,11 @@ class GraphQLController
     {
         // 是要要根据权限生成graphql type
         $resources = $context->getValue('resources', []);
+        $schema    = $context->getValue('graphql.schema');
 
         return $context->has('resources') && !empty($resources)
-            ? SchemaConfig::rbac($this->getGraphQLManager($config), $config, $resources)
-            : SchemaConfig::make($this->getGraphQLManager($config), $config);
+            ? SchemaConfig::rbac($this->getGraphQLManager($config), $schema, $resources)
+            : SchemaConfig::make($this->getGraphQLManager($config), $schema);
     }
 
     /**

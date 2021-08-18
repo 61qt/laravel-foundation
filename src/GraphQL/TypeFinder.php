@@ -3,12 +3,13 @@
 namespace QT\Foundation\GraphQL;
 
 use RuntimeException;
+use Illuminate\Support\Arr;
 use QT\GraphQL\GraphQLManager;
 use Illuminate\Support\Collection;
 
 /**
  * GraphQLManager文件查询
- * 
+ *
  * @package QT\Foundation\GraphQL
  */
 class TypeFinder
@@ -28,7 +29,11 @@ class TypeFinder
      */
     public function __construct(protected array | Collection $config)
     {
-        array_unshift($this->namespaces, "{$config['namespace']}\\GraphQL");
+        if (!empty($config['namespace'])) {
+            foreach (Arr::wrap($config['namespace']) as $namespace) {
+                array_unshift($this->namespaces, "{$namespace}\\GraphQL");
+            }
+        }
     }
 
     /**
