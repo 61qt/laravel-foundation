@@ -17,6 +17,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use QT\Import\Exceptions\ValidationException as ImportValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -53,7 +54,7 @@ class Handler extends ExceptionHandler
         if ($e instanceof GraphQLError && $e->getPrevious() !== null) {
             return $this->shouldntReport($e->getPrevious());
         }
-    
+
         if ($e instanceof Error) {
             return !$e->shouldReport();
         }
@@ -139,6 +140,11 @@ class Handler extends ExceptionHandler
             case $e instanceof PostTooLargeException:
                 $msg  = "上传文件大小超过" . ini_get('post_max_size');
                 $code = 413;
+                break;
+
+            case $e instanceof ImportValidationException:
+                $code = 400;
+                $msg  = $e->getMessage();
                 break;
 
             default:
