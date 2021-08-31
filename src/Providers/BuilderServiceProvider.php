@@ -18,8 +18,6 @@ class BuilderServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // \Illuminate\Database\Query\Builder
-
         /**
          * 减量操作,防止最小值小于0出现越界错误
          *
@@ -40,8 +38,6 @@ class BuilderServiceProvider extends ServiceProvider
                 $this->update($values);
             }
         });
-
-        // \Illuminate\Database\Eloquent\Builder
 
         /**
          * 按照主键id读取数据，如果数据不存在报错
@@ -74,6 +70,16 @@ class BuilderServiceProvider extends ServiceProvider
             }
 
             return $model;
+        });
+
+        /**
+         * 数据是否存在,不存在抛出异常
+         *
+         * @param string $errorMessage
+         */
+        EloquentBuilder::macro('existsOrError', function ($errorMessage = '数据不存在') {
+            /** @var EloquentBuilder $this */
+            $this->existsOr(fn() => throw new Error('NOT_FOUND', $errorMessage));
         });
     }
 }

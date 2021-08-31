@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
  * @method static static            firstOrFail($columns = ['*'])
  * @method static static            firstOr($columns = ['*'], Closure $callback = null)
  * @method static static            firstOrError($errorMessage = '')
+ * @method static static            existsOrError($errorMessage = '')
  *
  * 通用model
  *
