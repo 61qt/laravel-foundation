@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 /**
  * GraphQL Resolver 生成脚本
- * 
+ *
  * @package QT\Foundation\Console
  */
 class ResolverMakeCommand extends GeneratorCommand
@@ -45,7 +45,7 @@ class ResolverMakeCommand extends GeneratorCommand
 
     /**
      * 数据库字段类型在validate校验规则上的映射
-     * 
+     *
      * @var array
      */
     protected $ruleMaps = [
@@ -64,7 +64,7 @@ class ResolverMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/resolver.stub';
+        return __DIR__ . '/stubs/resolver.stub';
     }
 
     /**
@@ -92,20 +92,23 @@ class ResolverMakeCommand extends GeneratorCommand
 
         // 根据Resolver的名称获取Model名
         if ($model === null) {
-            $class = str_replace($this->getNamespace($name).'\\', '', $name);
+            $class = str_replace($this->getNamespace($name) . '\\', '', $name);
             $model = str_replace('Resolver', '', $class);
         }
 
         $table   = Str::snake(Str::pluralStudly($model));
         $replace = $this->buildModelReplacements($replace, $model);
         $replace = $this->buildRulesReplacements($replace, $table, explode(',', $rules));
+        $replace = $this->buildTableCommentReplacements($replace, $table, 'DummyModelComment');
         $replace = $this->buildClassParents($replace, Resolver::class, [
             \App\Resolvers\Resolver::class,
             \QT\GraphQL\Resolver::class,
         ]);
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            parent::buildClass($name)
         );
     }
 
@@ -119,7 +122,7 @@ class ResolverMakeCommand extends GeneratorCommand
     {
         $modelClass = $this->parseModel($model);
 
-        if (! class_exists($modelClass)) {
+        if (!class_exists($modelClass)) {
             if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
                 $args = ['name' => $model];
 
@@ -203,10 +206,10 @@ class ResolverMakeCommand extends GeneratorCommand
         }
 
         $model         = trim(str_replace('/', '\\', $model), '\\');
-        $rootNamespace = $this->rootNamespace().'Models\\';
+        $rootNamespace = $this->rootNamespace() . 'Models\\';
 
-        if (! Str::startsWith($model, $rootNamespace)) {
-            $model = $rootNamespace.$model;
+        if (!Str::startsWith($model, $rootNamespace)) {
+            $model = $rootNamespace . $model;
         }
 
         return $model;
@@ -222,7 +225,8 @@ class ResolverMakeCommand extends GeneratorCommand
         return array_merge($this->getModuleOptions(), [
             ['rules', null, InputOption::VALUE_OPTIONAL, 'rules'],
 
-            ['model', null, InputOption::VALUE_OPTIONAL, 'model']
+            ['model', null, InputOption::VALUE_OPTIONAL, 'model'],
         ]);
     }
 }
+

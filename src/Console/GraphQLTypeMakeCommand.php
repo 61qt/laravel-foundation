@@ -98,6 +98,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         $replace = $this->buildResolverReplacements($replace, $type);
         $replace = $this->buildFilterReplacements($replace, $table);
         $replace = $this->buildDataStructureReplacements($replace, $table);
+        $replace = $this->buildTableCommentReplacements($replace, $table, 'DummyDescription');
         $replace = $this->buildClassParents($replace, ModelType::class, [
             \App\GraphQL\Type\ModelType::class,
             \App\GraphQL\Definition\ModelType::class,
@@ -105,7 +106,9 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         ]);
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            parent::buildClass($name)
         );
     }
 
@@ -222,3 +225,4 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         return $resolver;
     }
 }
+

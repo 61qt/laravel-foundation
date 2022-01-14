@@ -2,8 +2,10 @@
 
 namespace QT\Foundation\Traits;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Doctrine\DBAL\Types\Types;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -174,4 +176,34 @@ STRING;
             ]);
         }
     }
+
+    /**
+     * Build type description
+     *
+     * @param array $replace
+     * @param string $table
+     * @param string $replaceKey
+     * @return array
+     */
+    protected function buildTableCommentReplacements(array $replace, string $table, string $replaceKey)
+    {
+        $comments = DB::select(
+            sprintf(
+                'SELECT table_comment FROM information_schema.tables WHERE table_schema = \'%s\' AND table_name = \'%s\'',
+                env('DB_DATABASE'),
+                $table
+            )
+        );
+
+        // 处理表名最后的`表`字
+        $tableName = Arr::first($comments)->table_comment ?? '';
+        if (!empty(preg_match('/表$/', $tableName, $miss))) {
+            $tableName = mb_substr($tableName, 0, -1);
+        }
+
+        return array_merge($replace, [
+            $replaceKey => $tableName,
+        ]);
+    }
 }
+
