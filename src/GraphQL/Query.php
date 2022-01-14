@@ -31,9 +31,10 @@ class Query extends ObjectType
     {
         if ($type instanceof Resolvable) {
             $this->types[$type->name] = [
-                'type'    => $type,
-                'resolve' => [$type, 'resolve'],
-                'args'    => $type->getArgs($this->manager),
+                'type'        => $type,
+                'resolve'     => [$type, 'resolve'],
+                'args'        => $type->getArgs($this->manager),
+                'description' => $type->description,
             ];
         }
 
@@ -46,3 +47,4 @@ class Query extends ObjectType
         }
     }
 }
+

@@ -46,12 +46,12 @@ class SchemaConfig extends BaseSchemaConfig
             $mutation = $manager->getMutation($file);
             $configs  = $mutation->getMutationConfig();
 
-            foreach ($configs as $name => [$type, $args, $resolve]) {
+            foreach ($configs as $name => [$type, $args, $resolve, $description]) {
                 if (!$skip && empty($resources[$name])) {
                     continue;
                 }
 
-                $fields[$name] = compact('type', 'args', 'resolve');
+                $fields[$name] = compact('type', 'args', 'resolve', 'description');
             }
         }
 
@@ -60,3 +60,4 @@ class SchemaConfig extends BaseSchemaConfig
         }
     }
 }
+
