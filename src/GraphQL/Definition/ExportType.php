@@ -8,6 +8,7 @@ use QT\Foundation\Auth\Resource;
 use QT\GraphQL\Contracts\Context;
 use QT\Foundation\Exceptions\Error;
 use QT\GraphQL\Contracts\Resolvable;
+use QT\GraphQL\Options\CursorOption;
 use QT\GraphQL\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use QT\Foundation\Export\ExcelGenerator;
@@ -104,8 +105,7 @@ abstract class ExportType extends ObjectType implements Resolvable
         }
 
         $resolver = $this->ofType->getResolver();
-        $query    = $resolver->getModelQuery();
-        $count    = $resolver->buildFilter($query, $args['filters'] ?? [])->count();
+        $count    = $resolver->getExportCount($context, new CursorOption($args));
 
         if (isset($resolver->exportLimit)) {
             $maxLimit = $resolver->exportLimit;
