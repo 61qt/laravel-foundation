@@ -80,7 +80,7 @@ class ExcelGenerator
     protected $reportCallback;
 
     /**
-     * Builder Construct
+     * ExcelGenerator Construct
      *
      * @param array $selectedColumns
      * @param array $exportColumns
@@ -93,19 +93,20 @@ class ExcelGenerator
         array $aliasColumns = [],
         protected array $filters = []
     ) {
+        $columns = [];
         foreach ($exportColumns as $column => $name) {
-            Arr::set($this->exportColumns, $column, $name);
+            Arr::set($columns, $column, $name);
         }
 
         foreach ($selectedColumns as $column) {
             // 检查字段是否在可导出范围内
-            if (!Arr::has($this->exportColumns, $column)) {
+            if (!Arr::has($columns, $column)) {
                 continue;
             }
             // 添加select字段
             Arr::set($this->selection, $column, true);
 
-            $name = Arr::get($this->exportColumns, $column);
+            $name = Arr::get($columns, $column);
             // 优先使用前端传递的别名
             $this->selectedColumns[$column] = Arr::get($aliasColumns, $column, $name);
         }
