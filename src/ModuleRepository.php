@@ -126,11 +126,11 @@ class ModuleRepository
     protected function registerResources(Collection $config, string $path)
     {
         if (file_exists("{$path}/views")) {
-            $this->app->get('view')->addNamespace("{$path}/views", $config['name']);
+            $this->app->get('view')->addNamespace($config['name'], "{$path}/views");
         }
 
         if (file_exists("{$path}/lang")) {
-            $this->app->get('translator')->addNamespace("{$path}/lang", $config['name']);
+            $this->app->get('translator')->addNamespace($config['name'], "{$path}/lang");
         }
     }
 
