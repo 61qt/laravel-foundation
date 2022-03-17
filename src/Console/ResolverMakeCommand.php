@@ -168,6 +168,12 @@ class ResolverMakeCommand extends GeneratorCommand
             $rule   = [];
             $column = $columns[$ruleColumn];
 
+            if (in_array($column->getName(), [
+                'created_at', 'updated_at', 'deleted_at',
+            ])) {
+                continue;
+            }
+
             if ($column->getNotnull()) {
                 $rule[] = 'required';
             }
@@ -229,4 +235,3 @@ class ResolverMakeCommand extends GeneratorCommand
         ]);
     }
 }
-

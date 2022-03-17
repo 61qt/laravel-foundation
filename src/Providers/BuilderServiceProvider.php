@@ -2,7 +2,6 @@
 
 namespace QT\Foundation\Providers;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use QT\Foundation\Exceptions\Error;
 use Illuminate\Database\Query\Builder;
@@ -47,13 +46,12 @@ class BuilderServiceProvider extends ServiceProvider
          */
         EloquentBuilder::macro('findOrError', function ($id, $errorMessage = '数据不存在') {
             /** @var EloquentBuilder $this */
-            $model = $this->find($id);
+            $result = $this->find($id);
 
-            if ($model === null || ($model instanceof Collection && $model->isEmpty())) {
+            if ((is_array($id) && $result->count() !== count($id)) || $result === null) {
                 throw new Error('NOT_FOUND', $errorMessage);
             }
-
-            return $model;
+            return $result;
         });
 
         /**
@@ -79,7 +77,7 @@ class BuilderServiceProvider extends ServiceProvider
          */
         EloquentBuilder::macro('existsOrError', function ($errorMessage = '数据不存在') {
             /** @var EloquentBuilder $this */
-            $this->existsOr(fn() => throw new Error('NOT_FOUND', $errorMessage));
+            $this->existsOr(fn () => throw new Error('NOT_FOUND', $errorMessage));
         });
     }
 }
