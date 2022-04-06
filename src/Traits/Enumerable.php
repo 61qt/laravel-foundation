@@ -52,7 +52,7 @@ trait Enumerable
                 $value = static::getDefaultDict();
             }
 
-            $results[$field] = new Dictionary($field, array_flip($value));
+            $results[$field] = new Dictionary(array_flip($value));
         }
 
         return $results;
