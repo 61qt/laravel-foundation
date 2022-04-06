@@ -2,79 +2,28 @@
 
 namespace QT\Foundation\Dictionaries;
 
-use QT\Import\Contracts\Dictionary as ImportDictionary;
+use QT\Import\Dictionary as ImportDictionary;
 
-class Dictionary implements ImportDictionary
+class Dictionary extends ImportDictionary
 {
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
-     * @var array
+     * @return string
      */
-    protected $maps;
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
      * @param string $name
-     * @param array $maps
      */
-    public function __construct(string $name, array $maps)
+    public function setName(string $name)
     {
         $this->name = $name;
-        $this->maps = $maps;
-    }
-
-    /**
-     * 检查key是否有对应的值
-     *
-     * @param string|int $key
-     * @return bool
-     */
-    public function has(string | int $key): bool
-    {
-        return isset($this->maps[$key]);
-    }
-
-    /**
-     * 获取key对应的值
-     *
-     * @param string|int $key
-     * @return string|int|null
-     */
-    public function get(string | int $key): string | int | null
-    {
-        return $this->has($key) ? $this->maps[$key] : null;
-    }
-
-    /**
-     * 获取所有的字典内容
-     *
-     * @return array
-     */
-    public function all(): array
-    {
-        return $this->maps;
-    }
-
-    /**
-     * 获取所有字典的key
-     *
-     * @return array
-     */
-    public function keys(): array
-    {
-        return array_keys($this->maps);
-    }
-
-    /**
-     * 获取所有字典的values
-     *
-     * @return array
-     */
-    public function values(): array
-    {
-        return array_values($this->maps);
     }
 }
