@@ -3,6 +3,7 @@
 namespace QT\Foundation\Export;
 
 use Iterator;
+use Throwable;
 use QT\Foundation\Model;
 use QT\GraphQL\Resolver;
 use Box\Spout\Common\Type;
@@ -10,11 +11,26 @@ use Illuminate\Support\Arr;
 use Box\Spout\Common\Entity\Row;
 use QT\GraphQL\Contracts\Context;
 use QT\GraphQL\Options\CursorOption;
+use Box\Spout\Writer\WriterInterface;
 use Box\Spout\Writer\Common\Creator\WriterFactory;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 class ExcelGenerator
 {
+    /**
+     * Excel Writer
+     *
+     * @var WriterInterface
+     */
+    protected $writer;
+
+    /**
+     * 文件临时储存路径
+     *
+     * @var string
+     */
+    protected $temporaryPath;
+
     /**
      * resolver中select的字段
      * [
@@ -113,6 +129,45 @@ class ExcelGenerator
     }
 
     /**
+     * 设置Excel写入类
+     *
+     * @param WriterInterface $writer
+     */
+    public function setWriter(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
+
+    /**
+     * 获取Excel写入类
+     *
+     * @param string $path
+     * @return WriterInterface
+     */
+    public function getWriter(): WriterInterface
+    {
+        if (!empty($this->writer)) {
+            return $this->writer;
+        }
+
+        return $this->writer = WriterFactory::createFromType(Type::XLSX);
+    }
+
+    /**
+     * 获取临时文件目录
+     *
+     * @return string
+     */
+    public function getTemporaryPath(): string
+    {
+        if (!empty($this->temporaryPath)) {
+            return $this->temporaryPath;
+        }
+
+        return $this->temporaryPath = tempnam('/tmp', 'export-');
+    }
+
+    /**
      * 从Resolver导出数据
      *
      * @param Resolver $resolver
@@ -120,14 +175,14 @@ class ExcelGenerator
      */
     public function export(Resolver $resolver, Context $context)
     {
-        $path   = tempnam('/tmp', 'export-');
-        $writer = WriterFactory::createFromType(Type::XLSX);
+        $path   = $this->getTemporaryPath();
         $model  = $resolver->getModelQuery()->getModel();
+        $writer = $this->getWriter();
 
         try {
             $writer->openToFile($path);
-            $writer->addRow($this->wrap($this->buildColumnName()));
 
+            $this->buildColumnName($writer);
             // 获取format的回调与字典
             $handlers = $model instanceof Model ? $model->getExportHandler() : [];
 
@@ -138,7 +193,7 @@ class ExcelGenerator
             }
 
             $writer->close();
-        } catch (\Throwable$e) {
+        } catch (Throwable $e) {
             // 防止excel生成失败时没有清理残留文件
             if (file_exists($path)) {
                 @unlink($path);
@@ -151,13 +206,14 @@ class ExcelGenerator
     }
 
     /**
-     * 生成表头
+     * 生成首行表头
      *
-     * @return array
+     * @param WriterInterface $writer
+     * @return void
      */
-    protected function buildColumnName(): array
+    protected function buildColumnName(WriterInterface $writer)
     {
-        return $this->selectedColumns;
+        $writer->addRow($this->wrap($this->selectedColumns));
     }
 
     /**
@@ -241,7 +297,7 @@ class ExcelGenerator
      *
      * @param array $row
      */
-    private function wrap(array $row): Row
+    protected function wrap(array $row): Row
     {
         return WriterEntityFactory::createRowFromArray($row);
     }
