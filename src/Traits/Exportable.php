@@ -87,7 +87,7 @@ trait Exportable
                 $relation = $relation->first();
             }
 
-            if (!$relation instanceof Model) {
+            if (!$relation instanceof self) {
                 continue;
             }
 
