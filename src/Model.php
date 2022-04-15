@@ -31,16 +31,16 @@ class Model extends EloquentModel
 {
     use Exportable;
 
-    const NO  = 0;
-    const YES = 1;
+    public const NO  = 0;
+    public const YES = 1;
 
     public static $yesOrNo = [
         self::NO  => '否',
         self::YES => '是',
     ];
 
-    const STATUS_NORMAL = 0;
-    const STATUS_BAN    = 1;
+    public const STATUS_NORMAL = 0;
+    public const STATUS_BAN    = 1;
 
     public static $statusMaps = [
         self::STATUS_NORMAL => '正常',
@@ -58,12 +58,10 @@ class Model extends EloquentModel
 
     protected static function eventBoot()
     {
-
     }
 
     protected static function baseModelBoot()
     {
-
     }
 
     /**
@@ -113,6 +111,22 @@ class Model extends EloquentModel
     }
 
     /**
+     * 延迟查询数据
+     *
+     * @param $query
+     * @param $sleep
+     * @param $method
+     * @return Model|null
+     */
+    public static function delayQuery($query, $sleep = 0.5, $method = 'get')
+    {
+        // 等待db主从同步,微秒级暂停
+        usleep($sleep * 1000000);
+
+        return $query->{$method}();
+    }
+
+    /**
      * 查询单个model,支持失败重试机制
      *
      * @param $id
@@ -154,7 +168,7 @@ class Model extends EloquentModel
 
     /**
      * 流式获取
-     * 
+     *
      * @param @baseQuery
      * @param @lastId
      * @param @limit
@@ -199,7 +213,7 @@ class Model extends EloquentModel
         }
 
         foreach ($columns as $column => $count) {
-            $this->{$column} = $this->{$column}-$count;
+            $this->{$column} = $this->{$column} - $count;
 
             $this->syncOriginalAttribute($column);
         }
