@@ -1,4 +1,5 @@
 <?php
+
 namespace QT\Foundation\Auth;
 
 use Throwable;
@@ -441,17 +442,19 @@ class JWTGuard implements Guard, StatefulGuard
         $time    = time();
         $payload = array_merge($user->getJWTCustomClaims(), [
             // 签发时间
-            "iat"         => $time - 3,
+            "iat" => $time - 3,
             // 允许使用时间
-            "nbf"         => $time - 3,
+            "nbf" => $time - 3,
             // 过期时间
-            "exp"         => $time + ($ttl * 60),
+            "exp" => $time + ($ttl * 60),
             // 刷新token的过期时间
             "refresh_ttl" => $time + $refreshTtl * 60,
         ]);
 
         return JWT::encode(
-            $payload, $this->key, $this->algs[array_rand($this->algs)]
+            $payload,
+            $this->key,
+            $this->algs[array_rand($this->algs)]
         );
     }
 
@@ -499,7 +502,7 @@ class JWTGuard implements Guard, StatefulGuard
      *
      * @return null|string
      */
-    protected function getTokenFromRequest()
+    public function getTokenFromRequest()
     {
         $token = $this->request->bearerToken();
 
