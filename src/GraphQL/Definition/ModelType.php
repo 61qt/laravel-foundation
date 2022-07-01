@@ -2,10 +2,10 @@
 
 namespace QT\Foundation\GraphQL\Definition;
 
-use Illuminate\Support\Str;
 use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
 use GraphQL\Type\Definition\NonNull;
+use QT\GraphQL\Definition\ObjectType;
 use GraphQL\Type\Definition\ListOfType;
 use QT\Foundation\Export\ExcelGenerator;
 use GraphQL\Type\Definition\Type as BaseType;
@@ -108,16 +108,24 @@ abstract class ModelType extends BaseModelType
             }
 
             // 根据配置生成可访问字段
+            $name = "{$prefix}_{$field}";
             $func = fn () => $this->defineAccessFields(
                 $type->getDataStructure($this->manager),
                 $child,
-                "{$prefix}_{$field}"
+                $name,
             );
 
-            $results[$field] = $wrap($this->manager->create(
-                Str::camel("{$prefix}_{$field}"),
-                $func
-            ));
+            $description   = $fieldDef['description'] ?? $type->description;
+            $canAccessType = new ObjectType([
+                'name'        => $name,
+                'fields'      => $func,
+                'description' => $description,
+            ]);
+
+            $results[$field] = [
+                'description' => $description,
+                'type'        => $wrap($this->manager->setType($canAccessType)),
+            ];
         }
 
         return $results;
@@ -131,19 +139,14 @@ abstract class ModelType extends BaseModelType
      */
     protected function unwrap($type): array
     {
-        $wrap = function ($type) {
-            return $type;
-        };
+        $wrap = fn ($type) => $type;
+
         if ($type instanceof ListOfType) {
             $type = $type->getOfType();
-            $wrap = function ($type) {
-                return Type::listOf($type);
-            };
+            $wrap = fn ($type) => Type::listOf($type);
         } elseif ($type instanceof NonNull) {
             $type = $type->getOfType();
-            $wrap = function ($type) {
-                return Type::nonNull($type);
-            };
+            $wrap = fn ($type) => Type::nonNull($type);
         }
 
         return [$type, $wrap];

@@ -36,7 +36,7 @@ DummyRules
     }
 
     /**
-     * 新增一条DummyModelComment
+     * 新增DummyModelComment
      *
      * @param Context $context
      * @param array $input
