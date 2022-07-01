@@ -67,7 +67,7 @@ abstract class ExportType extends ObjectType implements Resolvable
                 'type'        => Type::listOf(Type::string()),
                 'description' => '导出的字段',
             ],
-            'filters'       => [
+            'filters' => [
                 'type'        => $this->ofType->getFiltersInput(),
                 'description' => '查询条件',
             ],
@@ -75,10 +75,14 @@ abstract class ExportType extends ObjectType implements Resolvable
                 'type'        => Type::json(),
                 'description' => '导出字段别名',
             ],
-            'name'          => [
+            'name' => [
                 'type'         => Type::string(),
                 'description'  => '下载任务名',
                 'defaultValue' => $this->name,
+            ],
+            'orderBy' => [
+                'type'        => Type::listOf($this->ofType->getSortFields()),
+                'description' => '排序字段',
             ],
         ];
     }
@@ -124,7 +128,8 @@ abstract class ExportType extends ObjectType implements Resolvable
         $generator = $this->ofType->getExportGenerator(
             $args['exportColumns'],
             $args['exportAliases'] ?? [],
-            $args['filters'] ?? []
+            $args['filters'] ?? [],
+            $args['orderBy'] ?? []
         );
 
         return $this->createTask($generator, $context, $count, $args);

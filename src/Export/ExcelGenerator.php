@@ -107,7 +107,8 @@ class ExcelGenerator
         array $selectedColumns,
         array $exportColumns,
         array $aliasColumns = [],
-        protected array $filters = []
+        protected array $filters = [],
+        protected array $orderBy = []
     ) {
         $columns = [];
         foreach ($exportColumns as $column => $name) {
@@ -141,7 +142,6 @@ class ExcelGenerator
     /**
      * 获取Excel写入类
      *
-     * @param string $path
      * @return WriterInterface
      */
     public function getWriter(): WriterInterface
@@ -171,9 +171,10 @@ class ExcelGenerator
      * 从Resolver导出数据
      *
      * @param Resolver $resolver
+     * @param Context $context
      * @return string
      */
-    public function export(Resolver $resolver, Context $context)
+    public function export(Resolver $resolver, Context $context): string
     {
         $path   = $this->getTemporaryPath();
         $model  = $resolver->getModelQuery()->getModel();
@@ -219,6 +220,8 @@ class ExcelGenerator
     /**
      * 获取导出数据
      *
+     * @param Resolver $resolver
+     * @param Context $context
      * @return Iterator
      */
     protected function getExportData(Resolver $resolver, Context $context): Iterator
@@ -231,12 +234,13 @@ class ExcelGenerator
      *
      * @return CursorOption
      */
-    protected function getExportOption()
+    protected function getExportOption(): CursorOption
     {
         return new CursorOption([
             'filters' => $this->filters,
             'limit'   => $this->limit,
             'offset'  => $this->offset,
+            'orderBy' => $this->orderBy,
         ]);
     }
 
@@ -247,7 +251,7 @@ class ExcelGenerator
      * @param array $handlers format回调or字典
      * @return array
      */
-    protected function formatRow($data, $handlers)
+    protected function formatRow($data, $handlers): array
     {
         if ($data instanceof Model) {
             $data = $data->setExportHandler($handlers)
@@ -277,9 +281,10 @@ class ExcelGenerator
     /**
      * 上报导出进度
      *
-     * @param int @progress
+     * @param integer $progress
+     * @return void
      */
-    protected function reportGenerateProgress($progress)
+    protected function reportGenerateProgress(int $progress)
     {
         // 缓存当前新增进度
         $this->count += $progress;

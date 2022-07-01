@@ -70,7 +70,7 @@ abstract class ModelType extends BaseModelType
      * @param string $prefix
      * @return array
      */
-    protected function defineAccessFields(array $fields, array $canAccess, string $prefix = '')
+    protected function defineAccessFields(array $fields, array $canAccess, string $prefix = ''): array
     {
         if (isset($canAccess['*'])) {
             // 允许全部字段访问时,根据可访问字段构建
@@ -108,14 +108,15 @@ abstract class ModelType extends BaseModelType
             }
 
             // 根据配置生成可访问字段
-            $func = fn() => $this->defineAccessFields(
-                $type->getDataStructure($this->manager), 
-                $child, 
+            $func = fn () => $this->defineAccessFields(
+                $type->getDataStructure($this->manager),
+                $child,
                 "{$prefix}_{$field}"
             );
 
             $results[$field] = $wrap($this->manager->create(
-                Str::camel("{$prefix}_{$field}"), $func
+                Str::camel("{$prefix}_{$field}"),
+                $func
             ));
         }
 
@@ -128,15 +129,21 @@ abstract class ModelType extends BaseModelType
      * @param Type $type
      * @return array
      */
-    protected function unwrap($type)
+    protected function unwrap($type): array
     {
-        $wrap = function ($type) {return $type;};
+        $wrap = function ($type) {
+            return $type;
+        };
         if ($type instanceof ListOfType) {
             $type = $type->getOfType();
-            $wrap = function ($type) {return Type::listOf($type);};
+            $wrap = function ($type) {
+                return Type::listOf($type);
+            };
         } elseif ($type instanceof NonNull) {
             $type = $type->getOfType();
-            $wrap = function ($type) {return Type::nonNull($type);};
+            $wrap = function ($type) {
+                return Type::nonNull($type);
+            };
         }
 
         return [$type, $wrap];
@@ -177,10 +184,16 @@ abstract class ModelType extends BaseModelType
     }
 
     /**
+     * excel导出生成器
+     *
+     * @param array $selected
+     * @param array $alias
+     * @param array $filters
+     * @param array $orderBy
      * @return ExcelGenerator
      */
-    public function getExportGenerator($selected, $alias, $filters): ExcelGenerator
+    public function getExportGenerator(array $selected, array $alias, array $filters, array $orderBy): ExcelGenerator
     {
-        return new ExcelGenerator($selected, $this->getExportColumns(), $alias, $filters);
+        return new ExcelGenerator($selected, $this->getExportColumns(), $alias, $filters, $orderBy);
     }
 }
