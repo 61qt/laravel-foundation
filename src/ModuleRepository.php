@@ -8,10 +8,19 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use QT\Foundation\Exceptions\Error;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Console\Application as Console;
 use Illuminate\Contracts\Foundation\Application;
 
+/**
+ * 模块配置信息
+ * 
+ * @package QT\Foundation
+ */
 class ModuleRepository
 {
+    /**
+     * @var array
+     */
     protected $modules = [];
 
     /**
@@ -24,21 +33,39 @@ class ModuleRepository
     }
 
     /**
-     * @return array
+     * @param string $key
+     * @param mixed $default
+     * @return Collection
      */
-    public function modules(): array
+    public function get(string $module, $default = null): Collection
     {
-        return $this->modules;
+        return Arr::get($this->modules, $module, $default);
     }
 
     /**
      * @param string $key
-     * @param mixed $default
+     * @return Collection
+     */
+    public function has(string $module)
+    {
+        return isset($this->modules[$module]);
+    }
+
+    /**
+     * @param string $key
      * @return Collection
      */
     public function config(string $module): Collection
     {
         return $this->modules[$module];
+    }
+
+    /**
+     * @return array
+     */
+    public function modules(): array
+    {
+        return $this->modules;
     }
 
     /**
@@ -51,6 +78,7 @@ class ModuleRepository
         $routeFile    = Arr::get($moduleConfig, 'route_file', 'route.php');
         $graphqlFile  = Arr::get($moduleConfig, 'graphql_file', 'graphql.php');
         $resourcePath = Arr::get($moduleConfig, 'resource_path', 'Resources');
+        $commandPath  = Arr::get($moduleConfig, 'command_path', 'Commands');
         $middleware   = Arr::get($moduleConfig, 'http.middleware', []);
 
         foreach (new FilesystemIterator($moduleConfig['path']) as $file) {
@@ -79,7 +107,10 @@ class ModuleRepository
                 $config['namespace'] = $namespace . Str::ucfirst(Str::camel($name));
             }
 
+            // TODO 初始化逻辑支持自定义扩展 
+            // register('config_key', resolver)
             $this->registerRoute($config, "{$path}/{$routeFile}");
+            $this->registerCommands($config, "{$path}/{$commandPath}");
             $this->registerResources($config, "{$path}/{$resourcePath}");
             $this->registerGraphqlSchema($config, "{$path}/{$graphqlFile}");
 
@@ -117,6 +148,34 @@ class ModuleRepository
         );
 
         $register->prefix($name)->namespace($namespace)->group($path);
+    }
+
+    /**
+     * @param Collection $config
+     * @param string $path
+     */
+    protected function registerCommands(Collection $config, string $path)
+    {
+        if (!file_exists($path)) {
+            return;
+        }
+
+        $commands = [];
+        foreach (new FilesystemIterator($path) as $file) {
+            if (!$file->isFile() || !$file->getExtension() === 'php') {
+                continue;
+            }
+
+            $commands[] = sprintf(
+                "%s\\Commands\\%s", 
+                $config['namespace'], 
+                substr($file->getFilename(), 0, -4)
+            );
+        }
+
+        Console::starting(function ($artisan) use ($commands) {
+            $artisan->resolveCommands($commands);
+        });
     }
 
     /**

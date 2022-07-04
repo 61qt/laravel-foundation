@@ -45,12 +45,11 @@ class GraphQLController
      */
     public function module(Request $request, ModuleRepository $repository, $module)
     {
-        $config = $repository->config($module);
-
-        if (empty($config)) {
+        if (!$repository->has($module)) {
             throw new Error('NOT_FOUND', "{$module}模块不存在");
         }
 
+        $config = $repository->config($module);
         // 允许模块自定义鉴权方式
         if (!empty($config['guard'])) {
             Auth::shouldUse($config['guard']);
