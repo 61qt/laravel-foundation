@@ -140,8 +140,9 @@ abstract class ExportType extends ObjectType implements Resolvable
      *
      * @param ExcelGenerator $generator
      * @param Context $context
-     * @param array array $args
-     * @param int $total
+     * @param integer $total
+     * @param array $args
+     * @return mixed
      */
     abstract public function createTask(ExcelGenerator $generator, Context $context, int $total, array $args): mixed;
 }

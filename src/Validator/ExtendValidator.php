@@ -1,4 +1,5 @@
 <?php
+
 namespace QT\Foundation\Validator;
 
 use Illuminate\Validation\Validator;
@@ -20,7 +21,7 @@ class ExtendValidator
     // 身份证号码校验
     public function idNumber($attribute, $value, $params, Validator $validator)
     {
-        if (preg_match('/^[1-8]\d{5}(19|20)\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)(0|1|2|3)\d{4}(\d|x|X)$/', $value) !== 1) {
+        if (preg_match('/^[1-8]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])[0-3]\d{4}(\d|x|X)$/', $value) !== 1) {
             return false;
         }
 
@@ -65,7 +66,7 @@ class ExtendValidator
 
     public function greaterThanEqualMsg($message, $attribute, $rule, $params)
     {
-        return str_replace(':field', trans("validation.attributes.$params[0]"), $message);
+        return str_replace(':field', trans("validation.attributes.{$params[0]}"), $message);
     }
 
     // 字母和数字匹配
@@ -86,10 +87,29 @@ class ExtendValidator
         return preg_match('/^[0-9a-zA-Z\d\x!$#%]+$/', $value) === 1;
     }
 
-    // 严格密码,至少需要满足3种格式,单词大小写,1-9,符号(!,$,#,%),Unicode字符
+    // 严格密码,至少需要满足3种格式,英文字母大小写,数字,ascii特殊符号(!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)
     public function strictPassword($attribute, $value, $params, $validator)
     {
-        return preg_match('/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/', $value) === 1;
+        if (preg_match('/^[\w\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]{8,32}$/', $value) !== 1) {
+            return false;
+        }
+
+        $count = 0;
+        $rules = [
+            '/[\d]/',
+            '/[a-z]/',
+            '/[A-Z]/',
+            '/[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]/',
+        ];
+
+        // 分开校验，避免正则表达式太长
+        foreach ($rules as $rule) {
+            if (preg_match($rule, $value) === 1) {
+                $count++;
+            }
+        }
+
+        return $count >= 3;
     }
 
     public function isChinese($attribute, $value, $params, $validator)
@@ -104,7 +124,7 @@ class ExtendValidator
         }
 
         // https://www.compart.com/en/unicode/U+00B7
-        return preg_match('/^[·\pL\pM\pN_-]+$/u', $value) > 0;
+        return preg_match('/^[·a-zA-Z\d\p{Han}]+$/u', $value) > 0;
     }
 
     // ConvertEmptyStringsToNull中间件将""转换成null，需要特殊处理

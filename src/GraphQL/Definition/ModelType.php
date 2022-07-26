@@ -2,6 +2,7 @@
 
 namespace QT\Foundation\GraphQL\Definition;
 
+use Illuminate\Support\Str;
 use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
 use GraphQL\Type\Definition\NonNull;
@@ -108,16 +109,15 @@ abstract class ModelType extends BaseModelType
             }
 
             // 根据配置生成可访问字段
-            $name = "{$prefix}_{$field}";
             $func = fn () => $this->defineAccessFields(
                 $type->getDataStructure($this->manager),
                 $child,
-                $name,
+                "{$prefix}_{$field}"
             );
 
             $description   = $fieldDef['description'] ?? $type->description;
             $canAccessType = new ObjectType([
-                'name'        => $name,
+                'name'        => Str::camel("{$prefix}_{$field}"),
                 'fields'      => $func,
                 'description' => $description,
             ]);
