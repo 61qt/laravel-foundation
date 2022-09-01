@@ -104,16 +104,18 @@ trait Exportable
      */
     protected function getValue($field, $selected)
     {
-        $value    = $this->getAttribute($field);
-        $handlers = $this->getExportHandler();
+        if (empty($this->handlers)) {
+            $this->handlers = $this->getExportHandler();
+        }
 
-        if (array_key_exists($field, $handlers)) {
-            if (is_callable($handlers[$field])) {
+        $value = $this->getAttribute($field);
+        if (array_key_exists($field, $this->handlers)) {
+            if (is_callable($this->handlers[$field])) {
                 // 使用自定义方法进行处理
-                $value = call_user_func($handlers[$field], $this, $value);
-            } elseif (is_array($handlers[$field])) {
+                $value = call_user_func($this->handlers[$field], $this, $value);
+            } elseif (is_array($this->handlers[$field])) {
                 // 根据字典值进行转换,如果没有对应字典值返回空字符
-                return $handlers[$field][$value] ?? '';
+                return $this->handlers[$field][$value] ?? '';
             }
         }
 
