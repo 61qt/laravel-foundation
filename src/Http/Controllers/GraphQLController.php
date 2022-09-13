@@ -2,13 +2,13 @@
 
 namespace QT\Foundation\Http\Controllers;
 
-use Error;
 use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use QT\GraphQL\GraphQLManager;
 use QT\Foundation\Http\Context;
+use QT\Foundation\Exceptions\Error;
 use QT\Foundation\ModuleRepository;
 use Illuminate\Support\Facades\Auth;
 use QT\Foundation\GraphQL\TypeFinder;
