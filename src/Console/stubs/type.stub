@@ -31,20 +31,6 @@ class DummyClass extends DummyParent
     public $description = 'DummyDescription';
 
     /**
-     * 必须选中的字段(填充关联字段)
-     *
-     * @var array
-     */
-    protected $mustSelection = [];
-
-    /**
-     * 详细页面进行展示的字段(填充超长字段)
-     *
-     * @var array
-     */
-    protected $detailedFields = [];
-
-    /**
      * 支持排序的字段
      *
      * @var array

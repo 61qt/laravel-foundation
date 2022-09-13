@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use QT\Foundation\GraphQL\TypeFinder;
 use GraphQL\Validator\Rules\QueryDepth;
 use QT\Foundation\GraphQL\SchemaConfig;
+use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
@@ -28,10 +29,11 @@ class GraphQLController
     public function graphql(Request $request)
     {
         $config  = config('graphql');
-        $context = new Context($request, new Response, ['graphql' => $config]);
+        $context = new Context($request, new Response(), ['graphql' => $config]);
 
         return $context->response->setContent($this->resolveGraphQL(
-            $context, $this->getSchemaConfig($config, $context)
+            $context,
+            $this->getSchemaConfig($config, $context)
         ));
     }
 
@@ -56,10 +58,11 @@ class GraphQLController
         }
 
         $config  = $config->mergeRecursive(['graphql' => config('graphql')])->toArray();
-        $context = new Context($request, new Response, $config);
+        $context = new Context($request, new Response(), $config);
 
         return $context->response->setContent($this->resolveGraphQL(
-            $context, $this->getSchemaConfig($config, $context)
+            $context,
+            $this->getSchemaConfig($config, $context)
         ));
     }
 
@@ -108,7 +111,7 @@ class GraphQLController
      */
     protected function getGraphQLManager(array $config): GraphQLManager
     {
-        return tap(new GraphQLManager, function ($manager) use ($config) {
+        return tap(new GraphQLManager(), function ($manager) use ($config) {
             $manager->setTypeFinder(new TypeFinder($config));
         });
     }
@@ -150,10 +153,10 @@ class GraphQLController
      */
     protected function getGraphQlRules(Context $context)
     {
-        return [
-            new QueryDepth($context->getValue('graphql.max_depth')),
-            new QueryComplexity($context->getValue('graphql.complexity')),
-            new DisableIntrospection($context->getValue('graphql.introspection', 0)),
-        ];
+        return array_merge(DocumentValidator::defaultRules(), [
+            QueryDepth::class           => new QueryDepth($context->getValue('graphql.max_depth')),
+            QueryComplexity::class      => new QueryComplexity($context->getValue('graphql.complexity')),
+            DisableIntrospection::class => new DisableIntrospection($context->getValue('graphql.introspection', 0)),
+        ]);
     }
 }
