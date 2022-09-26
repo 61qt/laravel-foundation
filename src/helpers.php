@@ -7,18 +7,6 @@ if (!function_exists('isDevelopEnv')) {
     }
 }
 
-if (!function_exists('report_exception')) {
-    function report_exception(Throwable $exception)
-    {
-        if (isDevelopEnv() || !app()->bound('sentry')) {
-            return;
-        }
-
-        app('sentry')->tags_context(['HOSTNAME' => env('HOSTNAME')]);
-        app('sentry')->captureException($exception);
-    }
-}
-
 if (!function_exists('module_path')) {
     function module_path($path)
     {
