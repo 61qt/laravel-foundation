@@ -147,7 +147,10 @@ class ModuleRepository
             "{$config['namespace']}\\Http\\Controllers"
         );
 
-        $register->prefix($name)->namespace($namespace)->group($path);
+        $register->as("{$name}.")
+            ->prefix($name)
+            ->namespace($namespace)
+            ->group($path);
     }
 
     /**
