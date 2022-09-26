@@ -18,6 +18,11 @@ use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
+/**
+ * GraphQLController
+ * 
+ * @package QT\Foundation\Http\Controllers
+ */
 class GraphQLController
 {
     /**
