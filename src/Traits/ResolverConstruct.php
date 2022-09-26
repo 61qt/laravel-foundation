@@ -4,6 +4,11 @@ namespace QT\Foundation\Traits;
 
 use Illuminate\Contracts\Validation\Factory;
 
+/**
+ * Resolver初始化
+ * 
+ * @package QT\Foundation\Traits
+ */
 trait ResolverConstruct
 {
     /**

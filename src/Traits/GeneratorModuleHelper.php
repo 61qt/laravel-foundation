@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * 生成module下文件方法集合
+ * 
+ * @package QT\Foundation\Traits
+ */
 trait GeneratorModuleHelper
 {
     /**

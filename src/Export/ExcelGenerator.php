@@ -15,6 +15,11 @@ use Box\Spout\Writer\WriterInterface;
 use Box\Spout\Writer\Common\Creator\WriterFactory;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
+/**
+ * Excel生成器
+ * 
+ * @package QT\Foundation\Export
+ */
 class ExcelGenerator
 {
     /**

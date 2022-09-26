@@ -4,6 +4,11 @@ namespace QT\Foundation\Exceptions;
 
 use RuntimeException;
 
+/**
+ * 业务错误
+ * 
+ * @package QT\Foundation\Exceptions
+ */
 class Error extends RuntimeException
 {
     const DEFAULT_ERR_CODE = 1000;

@@ -4,6 +4,12 @@ namespace QT\Foundation\Dictionaries;
 
 use QT\Import\Dictionary as ImportDictionary;
 
+
+/**
+ * Import Dictionary
+ *
+ * @package QT\Foundation\Dictionaries
+ */
 class Dictionary extends ImportDictionary
 {
     /**

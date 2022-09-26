@@ -4,6 +4,11 @@ namespace QT\Foundation\Traits;
 
 use Illuminate\Support\Facades\Redis;
 
+/**
+ * 单点登录校验逻辑
+ * 
+ * @package QT\Foundation\Traits
+ */
 trait SingleSignOn
 {
     /**

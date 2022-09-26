@@ -19,6 +19,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use QT\Import\Exceptions\ValidationException as ImportValidationException;
 
+/**
+ * 异常处理
+ * 
+ * @package QT\Foundation\Exceptions
+ */
 class Handler extends ExceptionHandler
 {
     /**

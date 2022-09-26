@@ -14,6 +14,11 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use QT\Foundation\Contracts\GraphQLAuthenticatable;
 
+/**
+ * JWT
+ * 
+ * @package QT\Foundation\Auth
+ */
 class JWTGuard implements Guard, StatefulGuard
 {
     use GuardHelpers;

@@ -5,6 +5,11 @@ namespace QT\Foundation\Auth;
 use QT\GraphQL\Contracts\Context;
 use QT\Foundation\Contracts\GraphQLAuthenticatable;
 
+/**
+ * Resource
+ * 
+ * @package QT\Foundation\Auth
+ */
 class Resource
 {
     /**

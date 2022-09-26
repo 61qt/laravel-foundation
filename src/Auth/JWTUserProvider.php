@@ -1,4 +1,5 @@
 <?php
+
 namespace QT\Foundation\Auth;
 
 use RuntimeException;
@@ -6,6 +7,11 @@ use QT\Foundation\Contracts\JWTSubject;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
+/**
+ * JWTUserProvider
+ * 
+ * @package QT\Foundation\Auth
+ */
 class JWTUserProvider extends EloquentUserProvider
 {
     /**
