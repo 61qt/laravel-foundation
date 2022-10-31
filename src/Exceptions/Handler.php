@@ -74,8 +74,6 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable('report_exception');
-
         $this->renderable(function (Throwable $e, Request $request) {
             // graphql会把错误包装一层抛出,所以获取原异常信息处理
             if ($e instanceof GraphQLError && $e->getPrevious() !== null) {
