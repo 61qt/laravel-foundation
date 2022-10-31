@@ -8,19 +8,22 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use QT\GraphQL\GraphQLManager;
 use QT\Foundation\Http\Context;
+use GraphQL\Language\AST\FieldNode;
 use QT\Foundation\Exceptions\Error;
 use QT\Foundation\ModuleRepository;
 use Illuminate\Support\Facades\Auth;
+use GraphQL\Executor\ExecutionResult;
 use QT\Foundation\GraphQL\TypeFinder;
 use GraphQL\Validator\Rules\QueryDepth;
 use QT\Foundation\GraphQL\SchemaConfig;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
 /**
  * GraphQLController
- * 
+ *
  * @package QT\Foundation\Http\Controllers
  */
 class GraphQLController
@@ -50,7 +53,7 @@ class GraphQLController
      * @param string module
      * @return Response
      */
-    public function module(Request $request, ModuleRepository $repository, $module)
+    public function module(Request $request, ModuleRepository $repository, string $module)
     {
         if (!$repository->has($module)) {
             throw new Error('NOT_FOUND', "{$module}模块不存在");
@@ -97,14 +100,47 @@ class GraphQLController
             $this->getGraphQlRules($context)
         );
 
-        if (!empty($results->errors)) {
-            throw $results->errors[0];
+        return $this->handleResult($context->getRequest(), $results);
+    }
+
+    /**
+     * @param Request $request
+     * @param ExecutionResult $result
+     * @return array
+     */
+    protected function handleResult(Request $request, ExecutionResult $result): array
+    {
+        if (!$request->has('catch') && !empty($result->errors)) {
+            throw $result->errors[0];
+        }
+
+        $errors  = [];
+        $handler = app(ExceptionHandler::class);
+        foreach ($result->errors as $error) {
+            // 记录错误信息
+            $handler->report($error);
+            // 整合错误信息
+            foreach ($error->getNodes() as $node) {
+                if (!$node instanceof FieldNode) {
+                    continue;
+                }
+
+                if ($node->alias !== null) {
+                    $name = $node->alias->value;
+                } else {
+                    $name = $node->name->value;
+                }
+
+                $errors[$name] = $error->getMessage();
+                break;
+            }
         }
 
         return [
-            'code' => 0,
-            'msg'  => 'success',
-            'data' => $results->data,
+            'code'   => 0,
+            'msg'    => 'success',
+            'data'   => $result->data ?? [],
+            'errors' => $errors,
         ];
     }
 
