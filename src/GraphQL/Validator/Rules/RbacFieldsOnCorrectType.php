@@ -3,12 +3,13 @@
 namespace QT\Foundation\GraphQL\Validator\Rules;
 
 use Throwable;
-use GraphQL\Error\Error;
 use QT\GraphQL\GraphQLManager;
 use GraphQL\Language\AST\NodeKind;
+use QT\Foundation\Exceptions\Error;
 use GraphQL\Language\AST\FieldNode;
 use QT\Foundation\GraphQL\RbacQuery;
 use GraphQL\Validator\ValidationContext;
+use GraphQL\Error\Error as GraphQLError;
 use QT\Foundation\GraphQL\Definition\ModelType;
 
 /**
@@ -46,7 +47,9 @@ class RbacFieldsOnCorrectType
 
                 $msg = static::undefinedFieldMessage($node, $type, $this->manager);
 
-                $context->reportError(new Error($msg, [$node]));
+                $context->reportError(
+                    new GraphQLError(nodes: [$node], previous: new Error('UNAUTH', $msg))
+                );
             },
         ];
     }
