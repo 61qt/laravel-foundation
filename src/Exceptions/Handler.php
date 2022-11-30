@@ -21,7 +21,7 @@ use QT\Import\Exceptions\ValidationException as ImportValidationException;
 
 /**
  * 异常处理
- * 
+ *
  * @package QT\Foundation\Exceptions
  */
 class Handler extends ExceptionHandler
@@ -93,7 +93,12 @@ class Handler extends ExceptionHandler
      */
     protected function prepareJsonResponse($request, Throwable $e)
     {
-        return new JsonResponse($this->convertExceptionToArray($e));
+        return new JsonResponse(
+            $this->convertExceptionToArray($e),
+            200,
+            ['Content-Type' => 'application/json; charset=utf-8'],
+            JSON_UNESCAPED_UNICODE
+        );
     }
 
     /**
