@@ -5,16 +5,16 @@ namespace QT\Foundation\GraphQL\Validator\Rules;
 use Throwable;
 use QT\GraphQL\GraphQLManager;
 use GraphQL\Language\AST\NodeKind;
-use QT\Foundation\Exceptions\Error;
 use GraphQL\Language\AST\FieldNode;
+use QT\Foundation\Exceptions\Error;
 use QT\Foundation\GraphQL\RbacQuery;
-use GraphQL\Validator\ValidationContext;
 use GraphQL\Error\Error as GraphQLError;
+use GraphQL\Validator\ValidationContext;
 use QT\Foundation\GraphQL\Definition\ModelType;
 
 /**
  * 根据角色拥有的权限检查字段是否可用
- * 
+ *
  * @package QT\Foundation\GraphQL\Validator\Rules
  */
 class RbacFieldsOnCorrectType
@@ -45,11 +45,9 @@ class RbacFieldsOnCorrectType
                     return;
                 }
 
-                $msg = static::undefinedFieldMessage($node, $type, $this->manager);
+                $error = new Error('FORBIDDEN', $this->undefinedFieldMessage($node, $type));
 
-                $context->reportError(
-                    new GraphQLError(nodes: [$node], previous: new Error('UNAUTH', $msg))
-                );
+                $context->reportError(new GraphQLError(nodes: [$node], previous: $error));
             },
         ];
     }
@@ -57,21 +55,22 @@ class RbacFieldsOnCorrectType
     /**
      * @param FieldNode $node
      * @param string $type
-     * @param GraphQLManager $manager
      * @return string
      */
-    public static function undefinedFieldMessage(FieldNode $node, $type, $manager)
+    protected function undefinedFieldMessage(FieldNode $node, $type)
     {
         if ($type instanceof ModelType) {
-            $fields = $type->getDataStructure($manager);
+            $fields = $type->getDataStructure($this->manager);
 
             if (!empty($fields[$node->name->value])) {
                 return sprintf('没有权限访问: "%s".', $node->name->value);
             }
-        } if ($type instanceof RbacQuery) {
+        }
+
+        if ($type instanceof RbacQuery) {
             try {
                 // 能取回type说明type存在但是没有权限
-                $manager->getType($node->name->value);
+                $this->manager->getType($node->name->value);
 
                 return sprintf('没有权限访问: "%s".', $node->name->value);
             } catch (Throwable $e) {
