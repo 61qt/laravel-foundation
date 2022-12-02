@@ -75,7 +75,7 @@ abstract class ModelType extends BaseModelType
     {
         if (isset($canAccess['*'])) {
             // 允许全部字段访问时,根据可访问字段构建
-            foreach (array_keys($fields) as $field) {
+            foreach ($fields as $field => $_) {
                 if (empty($canAccess[$field])) {
                     $canAccess[$field] = true;
                 }

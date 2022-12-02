@@ -264,7 +264,7 @@ class ExcelGenerator
         }
 
         $row = [];
-        foreach (array_keys($this->selectedColumns) as $column) {
+        foreach ($this->selectedColumns as $column => $_) {
             $row[] = Arr::get($data, $column);
         }
 
