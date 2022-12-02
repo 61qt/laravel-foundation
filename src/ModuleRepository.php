@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use QT\Foundation\Exceptions\Error;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Console\Application as Console;
 use Illuminate\Contracts\Foundation\Application;
 
 /**
@@ -19,17 +18,26 @@ use Illuminate\Contracts\Foundation\Application;
 class ModuleRepository
 {
     /**
+     * 模块配置
+     * 
      * @var array
      */
     protected $modules = [];
 
     /**
-     * @param Application $app
-     * @param array $moduleConfig
+     * 模块加载器
+     * 
+     * @var array<callable>
      */
-    public function __construct(protected Application $app, array $moduleConfig)
+    protected $loaders = [];
+
+    /**
+     * @param Application $app
+     */
+    public function __construct(protected Application $app)
     {
-        $this->boot($moduleConfig);
+        $this->registerLoader([$this, 'loadRoute']);
+        $this->registerLoader([$this, 'loadGraphqlSchema']);
     }
 
     /**
@@ -69,17 +77,26 @@ class ModuleRepository
     }
 
     /**
+     * 注册模块服务
+     * 
+     * @param callable $loader
+     * @return self
+     */
+    public function registerLoader(callable $loader)
+    {
+        $this->loaders[] = $loader;
+
+        return $this;
+    }
+
+    /**
      * @param array $moduleConfig
      */
     public function boot(array $moduleConfig)
     {
-        $namespace    = Arr::get($moduleConfig, 'namespace', 'Modules\\');
-        $configFile   = Arr::get($moduleConfig, 'config_file', 'config.php');
-        $routeFile    = Arr::get($moduleConfig, 'route_file', 'route.php');
-        $graphqlFile  = Arr::get($moduleConfig, 'graphql_file', 'graphql.php');
-        $resourcePath = Arr::get($moduleConfig, 'resource_path', 'Resources');
-        $commandPath  = Arr::get($moduleConfig, 'command_path', 'Commands');
-        $middleware   = Arr::get($moduleConfig, 'http.middleware', []);
+        $namespace  = Arr::get($moduleConfig, 'namespace', 'Modules\\');
+        $configFile = Arr::get($moduleConfig, 'config_file', 'config.php');
+        $middleware = Arr::get($moduleConfig, 'http.middleware', []);
 
         foreach (new FilesystemIterator($moduleConfig['path']) as $file) {
             if (!$file->isDir()) {
@@ -107,31 +124,31 @@ class ModuleRepository
                 $config['namespace'] = $namespace . Str::ucfirst(Str::camel($name));
             }
 
-            // TODO 初始化逻辑支持自定义扩展 
-            // register('config_key', resolver)
-            $this->registerRoute($config, "{$path}/{$routeFile}");
-            $this->registerCommands($config, "{$path}/{$commandPath}");
-            $this->registerResources($config, "{$path}/{$resourcePath}");
-            $this->registerGraphqlSchema($config, "{$path}/{$graphqlFile}");
+            // 初始化模块配置
+            foreach ($this->loaders as $loader) {
+                call_user_func($loader, $config, $path);
+            }
 
             $this->modules[$config['name']] = $config;
         }
     }
 
     /**
-     * @param Collection $config
+     * 加载路由
+     * 
+     * @param Collection<string, mixed> $config
      * @param string $path
      */
-    protected function registerRoute(Collection $config, string $path)
+    protected function loadRoute(Collection $config, string $path)
     {
+        $path = "{$path}/{$config->get('route_file', 'route.php')}";
+
         if (!file_exists($path)) {
             return;
         }
 
         $name = $config['name'];
-        $func = function ($middleware) use ($name) {
-            return str_replace('{module}', $name, $middleware);
-        };
+        $func = fn ($middleware) => str_replace('{module}', $name, $middleware);
 
         // 初始化中间件
         $register = Route::middleware(array_map($func, $config['middleware']));
@@ -154,54 +171,15 @@ class ModuleRepository
     }
 
     /**
+     * 加载graphql语法信息
+     * 
      * @param Collection $config
      * @param string $path
      */
-    protected function registerCommands(Collection $config, string $path)
+    protected function loadGraphqlSchema(Collection $config, string $path)
     {
-        if (!file_exists($path)) {
-            return;
-        }
+        $path = "{$path}/{$config->get('graphql_file', 'graphql.php')}";
 
-        $commands = [];
-        foreach (new FilesystemIterator($path) as $file) {
-            if (!$file->isFile() || !$file->getExtension() === 'php') {
-                continue;
-            }
-
-            $commands[] = sprintf(
-                "%s\\Commands\\%s", 
-                $config['namespace'], 
-                substr($file->getFilename(), 0, -4)
-            );
-        }
-
-        Console::starting(function ($artisan) use ($commands) {
-            $artisan->resolveCommands($commands);
-        });
-    }
-
-    /**
-     * @param Collection $config
-     * @param string $path
-     */
-    protected function registerResources(Collection $config, string $path)
-    {
-        if (file_exists("{$path}/views")) {
-            $this->app->get('view')->addNamespace($config['name'], "{$path}/views");
-        }
-
-        if (file_exists("{$path}/lang")) {
-            $this->app->get('translator')->addNamespace($config['name'], "{$path}/lang");
-        }
-    }
-
-    /**
-     * @param Collection $config
-     * @param string $path
-     */
-    protected function registerGraphqlSchema(Collection $config, string $path)
-    {
         // 获取graphql语法
         if (file_exists($path)) {
             $config->offsetSet('graphql', ['schema' => require $path]);
