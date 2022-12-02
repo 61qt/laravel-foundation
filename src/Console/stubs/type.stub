@@ -31,13 +31,6 @@ class DummyClass extends DummyParent
     public $description = 'DummyDescription';
 
     /**
-     * 支持排序的字段
-     *
-     * @var array
-     */
-    protected $sortFields = [];
-
-    /**
      * 获取GraphQL resolver
      *
      * @return Resolver
