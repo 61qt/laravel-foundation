@@ -48,7 +48,7 @@ class ModuleServiceProvider extends ServiceProvider
 
     /**
      * 注册模块服务
-     * 
+     *
      * @param ModuleRepository $repository
      */
     protected function registerModuleService(ModuleRepository $repository)
@@ -60,20 +60,20 @@ class ModuleServiceProvider extends ServiceProvider
             if (!file_exists($path)) {
                 return;
             }
-    
+
             $commands = [];
             foreach (new FilesystemIterator($path) as $file) {
                 if (!$file->isFile() || !$file->getExtension() === 'php') {
                     continue;
                 }
-    
+
                 $commands[] = sprintf(
-                    "%s\\Commands\\%s", 
-                    $config['namespace'], 
+                    "%s\\Commands\\%s",
+                    $config['namespace'],
                     substr($file->getFilename(), 0, -4)
                 );
             }
-    
+
             $this->commands($commands);
         });
 

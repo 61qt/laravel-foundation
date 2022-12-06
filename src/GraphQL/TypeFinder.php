@@ -42,7 +42,7 @@ class TypeFinder
      * @param GraphQLManager $manager
      * @return \GraphQL\Type\Definition\Type
      */
-    public function __invoke($name, $space, GraphQLManager $manager)
+    public function __invoke(string $name, string $space, GraphQLManager $manager)
     {
         foreach ($this->namespaces as $namespace) {
             $type = sprintf('%s\\%s\\%s', $namespace, $space, ucfirst($name));

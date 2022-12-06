@@ -75,10 +75,10 @@ class Model extends EloquentModel
     /**
      * 过滤非法字段
      *
-     * @param @attributes
+     * @param array|Collection $attributes
      * @return array
      */
-    public static function filterAttributes($attributes)
+    public static function filterAttributes(array|Collection $attributes): array
     {
         return app(static::class)->fill($attributes)->getAttributes();
     }
@@ -86,11 +86,11 @@ class Model extends EloquentModel
     /**
      * 批量插入,防止占位符溢出
      *
-     * @param $records
-     * @param $limit
+     * @param array|Collection $records
+     * @param integer $limit
      * @return void
      */
-    public static function safeInsert($records, $limit = 500)
+    public static function safeInsert(array|Collection $records, int $limit = 500)
     {
         if ($records instanceof Collection) {
             $records = $records->toArray();
@@ -113,12 +113,12 @@ class Model extends EloquentModel
     /**
      * 延迟查询数据
      *
-     * @param $query
-     * @param $sleep
-     * @param $method
-     * @return Model|null
+     * @param  $query
+     * @param float|int $sleep
+     * @param string $method
+     * @return Collection|Model|null
      */
-    public static function delayQuery($query, $sleep = 0.5, $method = 'get')
+    public static function delayQuery($query, float|int $sleep = 0.5, string $method = 'get')
     {
         // 等待db主从同步,微秒级暂停
         usleep($sleep * 1000000);
@@ -129,12 +129,12 @@ class Model extends EloquentModel
     /**
      * 查询单个model,支持失败重试机制
      *
-     * @param $id
-     * @param $tries
-     * @param $sleep
+     * @param integer $id
+     * @param integer $tries
+     * @param float|int $sleep
      * @return Model|null
      */
-    public static function tryFind($id, $tries = 3, $sleep = 0.5)
+    public static function tryFind(int $id, int $tries = 3, float|int $sleep = 0.5)
     {
         return self::tryQuery(self::whereKey($id), $tries, 'first', $sleep);
     }
@@ -142,13 +142,13 @@ class Model extends EloquentModel
     /**
      * 执行sql,支持失败重试机制
      *
-     * @param $id
-     * @param $tries
-     * @param $method
-     * @param $sleep
-     * @return Collection|Model|null
+     * @param $query
+     * @param integer $tries
+     * @param string $method
+     * @param float|int $sleep
+     * @return  Collection|Model|null
      */
-    public static function tryQuery($query, $tries = 3, $method = 'get', $sleep = 0.5)
+    public static function tryQuery($query, int $tries = 3, string $method = 'get', float|int $sleep = 0.5)
     {
         while ($tries-- > 0) {
             $result = $query->{$method}();
@@ -169,12 +169,12 @@ class Model extends EloquentModel
     /**
      * 流式获取
      *
-     * @param @baseQuery
-     * @param @lastId
-     * @param @limit
+     * @param $baseQuery
+     * @param integer $lastId
+     * @param integer $limit
      * @return \Generator
      */
-    public static function getCursor($baseQuery, $lastId = 0, $limit = 1000)
+    public static function getCursor($baseQuery, int $lastId = 0, int $limit = 1000)
     {
         $table   = $baseQuery->getModel()->getTable();
         $keyName = $baseQuery->getModel()->getKeyName();
@@ -204,7 +204,7 @@ class Model extends EloquentModel
      * @param array $columns
      * @return void
      */
-    public function safeDecrement($columns)
+    public function safeDecrement(array $columns)
     {
         $query = $this->newQuery();
 

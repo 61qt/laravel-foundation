@@ -4,7 +4,6 @@ namespace QT\Foundation\Dictionaries;
 
 use QT\Import\Dictionary as ImportDictionary;
 
-
 /**
  * Import Dictionary
  *

@@ -12,7 +12,7 @@ use Overtrue\EasySms\Exceptions\GatewayErrorException;
 
 class Ums86Gateway implements GatewayInterface
 {
-    const SMS_SERVER = 'http://sms.api.ums86.com:8899/sms/Api/Send.do';
+    public const SMS_SERVER = 'http://sms.api.ums86.com:8899/sms/Api/Send.do';
 
     /**
      * {@inheritDoc}

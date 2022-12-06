@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 /**
  * 可导出的model
- * 
+ *
  * @package QT\Foundation\Traits
  */
 trait Exportable
@@ -16,7 +16,7 @@ trait Exportable
 
     /**
      * 导出时每一个字段对应的format逻辑
-     * 
+     *
      * @var array
      */
     protected $handlers = [];
@@ -24,9 +24,10 @@ trait Exportable
     /**
      * 设置导出字段处理方式
      *
-     * @return static
+     * @param array $handlers
+     * @return self
      */
-    public function setExportHandler(array $handlers)
+    public function setExportHandler(array $handlers): self
     {
         $this->handlers = $handlers;
 
@@ -58,7 +59,7 @@ trait Exportable
      * @param array $fields
      * @return array
      */
-    public function formatData($fields = [])
+    public function formatData(array $fields = []): array
     {
         $result = [];
         $fields = $fields ?: $this->getSelected();
@@ -74,7 +75,7 @@ trait Exportable
      *
      * @return array
      */
-    public function getSelected()
+    public function getSelected(): array
     {
         // 把attributes变为[column => true]格式
         $selected = array_combine(
@@ -98,11 +99,13 @@ trait Exportable
     }
 
     /**
+     * 格式化并获取值
+     *
      * @param string $field
-     * @param array|bool $selected
+     * @param array $selected
      * @return string|Model|Collection
      */
-    protected function getValue($field, $selected)
+    protected function getValue(string $field, array $selected)
     {
         if (empty($this->handlers)) {
             $this->handlers = $this->getExportHandler();

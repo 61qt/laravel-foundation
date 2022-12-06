@@ -7,7 +7,7 @@ use QT\Foundation\Contracts\GraphQLAuthenticatable;
 
 /**
  * Resource
- * 
+ *
  * @package QT\Foundation\Auth
  */
 class Resource
@@ -26,7 +26,7 @@ class Resource
         Context $context,
         string $type,
         array $selection
-    ): array{
+    ): array {
         // 获取用户拥有的权限
         $resources = $user->getResources($context);
 
@@ -39,8 +39,8 @@ class Resource
      * 检查selection是否有访问权限
      *
      * @param array $resources
-     * @param string $type
      * @param array $selection
+     * @param string $type
      * @param string $prefix
      * @return array
      */
@@ -49,7 +49,7 @@ class Resource
         array $selection,
         string $type,
         string $prefix = ''
-    ): array{
+    ): array {
         $unAuthColumns = [];
         $prefix .= $type . '-';
         foreach ($selection as $key => $value) {
@@ -85,7 +85,7 @@ class Resource
         Context $context,
         string $type,
         array $selection
-    ): array{
+    ): array {
         // 获取用户拥有的权限
         $resources = $user->getResources($context);
 

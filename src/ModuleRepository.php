@@ -12,21 +12,21 @@ use Illuminate\Contracts\Foundation\Application;
 
 /**
  * 模块配置信息
- * 
+ *
  * @package QT\Foundation
  */
 class ModuleRepository
 {
     /**
      * 模块配置
-     * 
+     *
      * @var array
      */
     protected $modules = [];
 
     /**
      * 模块加载器
-     * 
+     *
      * @var array<callable>
      */
     protected $loaders = [];
@@ -41,18 +41,22 @@ class ModuleRepository
     }
 
     /**
-     * @param string $key
+     * 获取模块内数据
+     *
+     * @param string $module
      * @param mixed $default
      * @return Collection
      */
-    public function get(string $module, $default = null): Collection
+    public function get(string $module, mixed $default = null): Collection
     {
         return Arr::get($this->modules, $module, $default);
     }
 
     /**
-     * @param string $key
-     * @return Collection
+     * 判断是否存在模块
+     *
+     * @param string $module
+     * @return boolean
      */
     public function has(string $module)
     {
@@ -60,7 +64,7 @@ class ModuleRepository
     }
 
     /**
-     * @param string $key
+     * @param string $module
      * @return Collection
      */
     public function config(string $module): Collection
@@ -78,11 +82,11 @@ class ModuleRepository
 
     /**
      * 注册模块服务
-     * 
+     *
      * @param callable $loader
      * @return self
      */
-    public function registerLoader(callable $loader)
+    public function registerLoader(callable $loader): self
     {
         $this->loaders[] = $loader;
 
@@ -135,7 +139,7 @@ class ModuleRepository
 
     /**
      * 加载路由
-     * 
+     *
      * @param Collection<string, mixed> $config
      * @param string $path
      */
@@ -172,7 +176,7 @@ class ModuleRepository
 
     /**
      * 加载graphql语法信息
-     * 
+     *
      * @param Collection $config
      * @param string $path
      */

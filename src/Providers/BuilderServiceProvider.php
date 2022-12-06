@@ -41,7 +41,7 @@ class BuilderServiceProvider extends ServiceProvider
         /**
          * 按照主键id读取数据，如果数据不存在报错
          *
-         * @param int | string $id
+         * @param int|array $id
          * @param string $errorMessage
          */
         EloquentBuilder::macro('findOrError', function ($id, $errorMessage = '数据不存在') {

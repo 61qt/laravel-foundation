@@ -17,7 +17,7 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 /**
  * Excel生成器
- * 
+ *
  * @package QT\Foundation\Export
  */
 class ExcelGenerator
@@ -107,6 +107,7 @@ class ExcelGenerator
      * @param array $exportColumns
      * @param array $aliasColumns
      * @param array $filters
+     * @param array $orderBy
      */
     public function __construct(
         array $selectedColumns,

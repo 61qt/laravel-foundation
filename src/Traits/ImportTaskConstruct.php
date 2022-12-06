@@ -21,9 +21,9 @@ trait ImportTaskConstruct
     }
 
     /**
-     * 获取Resolver绑定的model
+     * 初始化字典
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return void
      */
     protected function bootModelDictionary()
     {

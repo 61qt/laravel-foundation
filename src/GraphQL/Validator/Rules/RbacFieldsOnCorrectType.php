@@ -54,10 +54,10 @@ class RbacFieldsOnCorrectType
 
     /**
      * @param FieldNode $node
-     * @param string $type
+     * @param mixed $type
      * @return string
      */
-    protected function undefinedFieldMessage(FieldNode $node, $type)
+    protected function undefinedFieldMessage(FieldNode $node, $type): string
     {
         if ($type instanceof ModelType) {
             $fields = $type->getDataStructure($this->manager);

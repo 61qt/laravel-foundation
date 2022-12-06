@@ -78,9 +78,10 @@ class GraphQLController
      * 根据请求上下文处理graphql语法
      *
      * @param Context $context
+     * @param SchemaConfig $config
      * @return array
      */
-    protected function resolveGraphQL(Context $context, SchemaConfig $config)
+    protected function resolveGraphQL(Context $context, SchemaConfig $config): array
     {
         $source    = $context->request->input('query', null);
         $variables = $context->request->input('variables', []);
@@ -192,7 +193,7 @@ class GraphQLController
      * @param Context $context
      * @return array
      */
-    protected function getGraphQlRules(Context $context)
+    protected function getGraphQlRules(Context $context): array
     {
         return array_merge(DocumentValidator::defaultRules(), [
             QueryDepth::class           => new QueryDepth($context->getValue('graphql.max_depth')),

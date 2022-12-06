@@ -6,12 +6,12 @@ use RuntimeException;
 
 /**
  * 业务错误
- * 
+ *
  * @package QT\Foundation\Exceptions
  */
 class Error extends RuntimeException
 {
-    const DEFAULT_ERR_CODE = 1000;
+    public const DEFAULT_ERR_CODE = 1000;
 
     /**
      * @var array
@@ -28,7 +28,7 @@ class Error extends RuntimeException
      * @param string $message
      * @param array $data
      */
-    public function __construct($errCode = 'SYSTEM_FAILED', $message = '', $data = [])
+    public function __construct(string $errCode = 'SYSTEM_FAILED', string $message = '', array $data = [])
     {
         $config        = config("errors.{$errCode}");
         $this->code    = isset($config['code']) ? $config['code'] : self::DEFAULT_ERR_CODE;
@@ -40,7 +40,7 @@ class Error extends RuntimeException
      * @param array $data
      * @return self
      */
-    public function setData($data)
+    public function setData(array $data): self
     {
         $this->data = $data;
 
@@ -50,17 +50,18 @@ class Error extends RuntimeException
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
 
     /**
      * 变为可上报错误
-     * 
-     * @param bool $reportable
+     *
+     * @param boolean $reportable
+     * @return self
      */
-    public function reportable(bool $reportable = true)
+    public function reportable(bool $reportable = true): self
     {
         $this->reportable = $reportable;
 
@@ -69,7 +70,7 @@ class Error extends RuntimeException
 
     /**
      * 是否要上报错误信息
-     * 
+     *
      * @return bool
      */
     public function shouldReport(): bool

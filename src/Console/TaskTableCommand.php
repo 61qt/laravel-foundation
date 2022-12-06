@@ -61,7 +61,9 @@ class TaskTableCommand extends Command
         $model = Str::studly($table);
 
         $this->replaceMigration(
-            $this->createBaseMigration($table), $table, $model
+            $this->createBaseMigration($table),
+            $table,
+            $model
         );
 
         $this->info('Migration created successfully!');
@@ -78,7 +80,8 @@ class TaskTableCommand extends Command
     protected function createBaseMigration($table = 'failed_jobs')
     {
         return $this->laravel['migration.creator']->create(
-            'create_' . $table . '_table', $this->laravel->databasePath() . '/migrations'
+            'create_' . $table . '_table',
+            $this->laravel->databasePath() . '/migrations'
         );
     }
 
