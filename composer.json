@@ -27,5 +27,8 @@
             "name": "xurh",
             "email": "xurhwork@gmail.com"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
 }

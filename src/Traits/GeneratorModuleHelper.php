@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 /**
  * 生成module下文件方法集合
- * 
+ *
  * @package QT\Foundation\Traits
  */
 trait GeneratorModuleHelper
@@ -130,7 +130,7 @@ STRING;
      * @param  string $table
      * @return array
      */
-    protected function buildDataStructureReplacements(array $replace, $table)
+    protected function buildDataStructureReplacements(array $replace, string $table): array
     {
         // 获取表字段以及字段
         $dataStructure = [];
@@ -162,7 +162,7 @@ STRING;
      * @param  string $table
      * @return array
      */
-    protected function buildClassParents(array $replace, string $mustImplement, array $parents)
+    protected function buildClassParents(array $replace, string $mustImplement, array $parents): array
     {
         $parents = array_merge($this->option('parent_class') ?? [], $parents);
 
@@ -190,7 +190,7 @@ STRING;
      * @param string $replaceKey
      * @return array
      */
-    protected function buildTableCommentReplacements(array $replace, string $table, string $replaceKey)
+    protected function buildTableCommentReplacements(array $replace, string $table, string $replaceKey): array
     {
         $comments = DB::select(
             sprintf(
@@ -211,4 +211,3 @@ STRING;
         ]);
     }
 }
-

@@ -10,7 +10,7 @@ class CustomValidatorServiceProvider extends ServiceProvider
 {
     protected $extends = [
         ExtendValidator::class => [
-            'extend'   => [
+            'extend' => [
                 'phone_number'         => 'phoneNumber',
                 'id_number'            => 'idNumber',
                 'limit_decimal'        => 'limitDecimal',
@@ -58,6 +58,5 @@ class CustomValidatorServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
     }
 }

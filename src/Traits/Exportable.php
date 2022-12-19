@@ -102,10 +102,10 @@ trait Exportable
      * 格式化并获取值
      *
      * @param string $field
-     * @param array $selected
+     * @param array|boolean $selected
      * @return string|Model|Collection
      */
-    protected function getValue(string $field, array $selected)
+    protected function getValue(string $field, array|bool $selected)
     {
         if (empty($this->handlers)) {
             $this->handlers = $this->getExportHandler();

@@ -6,5 +6,4 @@ use QT\GraphQL\Context as BaseContext;
 
 class Context extends BaseContext
 {
-
 }

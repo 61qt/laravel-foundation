@@ -27,9 +27,12 @@ class RbacFieldsOnCorrectType
     }
 
     /**
+     * 获取访问信息
+     *
      * @param ValidationContext $context
+     * @return array
      */
-    public function getVisitor(ValidationContext $context)
+    public function getVisitor(ValidationContext $context): array
     {
         return [
             NodeKind::FIELD => function (FieldNode $node) use ($context): void {
@@ -57,7 +60,7 @@ class RbacFieldsOnCorrectType
      * @param mixed $type
      * @return string
      */
-    protected function undefinedFieldMessage(FieldNode $node, $type): string
+    protected function undefinedFieldMessage(FieldNode $node, mixed $type): string
     {
         if ($type instanceof ModelType) {
             $fields = $type->getDataStructure($this->manager);

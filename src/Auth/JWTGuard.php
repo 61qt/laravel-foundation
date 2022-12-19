@@ -16,7 +16,7 @@ use QT\Foundation\Contracts\GraphQLAuthenticatable;
 
 /**
  * JWT
- * 
+ *
  * @package QT\Foundation\Auth
  */
 class JWTGuard implements Guard, StatefulGuard
@@ -300,7 +300,7 @@ class JWTGuard implements Guard, StatefulGuard
         $ttl        = $this->ttl;
         $refreshTtl = $this->refreshTtl;
         // 管理员的token生效时间
-        if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+        if (method_exists($user, 'isAdmin') && call_user_func([$user, 'isAdmin'])) {
             $ttl        = $this->ttlAdmin;
             $refreshTtl = $this->refreshTtlAdmin;
         }

@@ -34,7 +34,7 @@ class GraphQLController
      * @param Request $request
      * @return Response
      */
-    public function graphql(Request $request)
+    public function graphql(Request $request): Response
     {
         $config  = config('graphql');
         $context = new Context($request, new Response(), ['graphql' => $config]);
@@ -53,7 +53,7 @@ class GraphQLController
      * @param string module
      * @return Response
      */
-    public function module(Request $request, ModuleRepository $repository, string $module)
+    public function module(Request $request, ModuleRepository $repository, string $module): Response
     {
         if (!$repository->has($module)) {
             throw new Error('NOT_FOUND', "{$module}模块不存在");
@@ -182,7 +182,7 @@ class GraphQLController
      * @param Context $context
      * @return mixed
      */
-    protected function getRootValue(Context $context)
+    protected function getRootValue(Context $context): mixed
     {
         return null;
     }
