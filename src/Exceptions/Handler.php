@@ -94,7 +94,7 @@ class Handler extends ExceptionHandler
     protected function prepareJsonResponse($request, Throwable $e)
     {
         return new JsonResponse(
-            $this->convertExceptionToArray($e),
+            $this->convertException($request, $e),
             200,
             ['Content-Type' => 'application/json; charset=utf-8'],
             JSON_UNESCAPED_UNICODE
@@ -104,10 +104,11 @@ class Handler extends ExceptionHandler
     /**
      * Convert the given exception to an array.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $e
      * @return array
      */
-    protected function convertExceptionToArray(Throwable $e)
+    protected function convertException($request, Throwable $e)
     {
         $msg  = $e->getMessage();
         $data = [];
@@ -134,6 +135,10 @@ class Handler extends ExceptionHandler
             case $e instanceof ModelNotFoundException:
                 $msg  = !isDevelopEnv() ? "访问的数据不存在" : $msg;
                 $code = 404;
+                break;
+
+            case $e instanceof TypeNotFoundException:
+                $code = $request->user() === null ? 401 : 403;
                 break;
 
             case $e instanceof MethodNotAllowedHttpException:
@@ -164,10 +169,6 @@ class Handler extends ExceptionHandler
                 break;
         }
 
-        return [
-            'code' => $code,
-            'msg'  => $msg,
-            'data' => $data,
-        ];
+        return ['code' => $code, 'msg' => $msg, 'data' => $data];
     }
 }

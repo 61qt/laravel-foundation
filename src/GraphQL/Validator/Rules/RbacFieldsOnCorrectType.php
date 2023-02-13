@@ -6,11 +6,11 @@ use Throwable;
 use QT\GraphQL\GraphQLManager;
 use GraphQL\Language\AST\NodeKind;
 use GraphQL\Language\AST\FieldNode;
-use QT\Foundation\Exceptions\Error;
 use QT\Foundation\GraphQL\RbacQuery;
-use GraphQL\Error\Error as GraphQLError;
 use GraphQL\Validator\ValidationContext;
+use GraphQL\Error\Error as GraphQLError;
 use QT\Foundation\GraphQL\Definition\ModelType;
+use QT\Foundation\Exceptions\TypeNotFoundException;
 
 /**
  * 根据角色拥有的权限检查字段是否可用
@@ -48,7 +48,7 @@ class RbacFieldsOnCorrectType
                     return;
                 }
 
-                $error = new Error('FORBIDDEN', $this->undefinedFieldMessage($node, $type));
+                $error = new TypeNotFoundException($this->undefinedFieldMessage($node, $type));
 
                 $context->reportError(new GraphQLError(nodes: [$node], previous: $error));
             },

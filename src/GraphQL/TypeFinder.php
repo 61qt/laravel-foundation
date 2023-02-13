@@ -2,10 +2,10 @@
 
 namespace QT\Foundation\GraphQL;
 
-use RuntimeException;
 use Illuminate\Support\Arr;
 use QT\GraphQL\GraphQLManager;
 use Illuminate\Support\Collection;
+use QT\Foundation\Exceptions\TypeNotFoundException;
 
 /**
  * GraphQLManager文件查询
@@ -52,6 +52,6 @@ class TypeFinder
             }
         }
 
-        throw new RuntimeException("{$name} Type Not Found");
+        throw new TypeNotFoundException("{$name} Type Not Found");
     }
 }
