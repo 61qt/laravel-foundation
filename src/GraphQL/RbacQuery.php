@@ -47,8 +47,8 @@ class RbacQuery extends Query
 
             $this->registerType($type);
 
-            if ($type instanceof ModelType) {
-                $type->canAccess = $this->resources[$name];
+            if (method_exists($type, 'setWhitelistFields')) {
+                $type->setWhitelistFields($this->resources[$name]);
             }
         }
     }

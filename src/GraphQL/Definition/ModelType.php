@@ -2,14 +2,9 @@
 
 namespace QT\Foundation\GraphQL\Definition;
 
-use Illuminate\Support\Str;
 use QT\GraphQL\GraphQLManager;
 use QT\GraphQL\Definition\Type;
-use GraphQL\Type\Definition\NonNull;
-use QT\GraphQL\Definition\ObjectType;
-use GraphQL\Type\Definition\ListOfType;
 use QT\Foundation\Export\ExcelGenerator;
-use GraphQL\Type\Definition\Type as BaseType;
 use QT\GraphQL\Definition\ModelType as BaseModelType;
 
 /**
@@ -19,13 +14,6 @@ use QT\GraphQL\Definition\ModelType as BaseModelType;
  */
 abstract class ModelType extends BaseModelType
 {
-    /**
-     * 允许访问的字段
-     *
-     * @var array
-     */
-    public $canAccess = [];
-
     /**
      * 是否启用导出类型
      *
@@ -46,111 +34,6 @@ abstract class ModelType extends BaseModelType
      * @var string
      */
     protected $keyType = 'bigint';
-
-    /**
-     * 获取model可用字段,允许继承细分可用字段
-     *
-     * @return array
-     */
-    protected function getModelFields(): array
-    {
-        $fields = $this->getDataStructure($this->manager);
-
-        if (empty($this->canAccess)) {
-            return $fields;
-        }
-
-        return $this->defineAccessFields($fields, $this->canAccess);
-    }
-
-    /**
-     * 根据允许访问的字段构建字段
-     *
-     * @param array $fields
-     * @param array $canAccess
-     * @param string $prefix
-     * @return array
-     */
-    protected function defineAccessFields(array $fields, array $canAccess, string $prefix = ''): array
-    {
-        if (isset($canAccess['*'])) {
-            // 允许全部字段访问时,根据可访问字段构建
-            foreach ($fields as $field => $_) {
-                if (empty($canAccess[$field])) {
-                    $canAccess[$field] = true;
-                }
-            }
-        }
-
-        $results = [];
-        foreach ($canAccess as $field => $child) {
-            // 字段不存在
-            if (empty($fields[$field])) {
-                continue;
-            }
-
-            if ($fields[$field] instanceof BaseType) {
-                $fieldDef = ['type' => $fields[$field]];
-            } elseif (is_array($fields[$field]) && !empty($fields[$field]['type'])) {
-                $fieldDef = $fields[$field];
-            }
-
-            [$type, $wrap] = $this->unwrap($fieldDef['type']);
-
-            if (!$type instanceof ModelType) {
-                $results[$field] = $fieldDef;
-                continue;
-            } elseif (!is_array($child)) {
-                continue;
-            }
-
-            if ($prefix === '') {
-                $prefix = $this->name;
-            }
-
-            // 根据配置生成可访问字段
-            $func = fn () => $this->defineAccessFields(
-                $type->getDataStructure($this->manager),
-                $child,
-                "{$prefix}_{$field}"
-            );
-
-            $description   = $fieldDef['description'] ?? $type->description;
-            $canAccessType = new ObjectType([
-                'name'        => Str::camel("{$prefix}_{$field}"),
-                'fields'      => $func,
-                'description' => $description,
-            ]);
-
-            $results[$field] = [
-                'description' => $description,
-                'type'        => $wrap($this->manager->setType($canAccessType)),
-            ];
-        }
-
-        return $results;
-    }
-
-    /**
-     * 如果type有包装,将其包装解除并返回包装回调函数
-     *
-     * @param Type $type
-     * @return array
-     */
-    protected function unwrap($type): array
-    {
-        $wrap = fn ($type) => $type;
-
-        if ($type instanceof ListOfType) {
-            $type = $type->getOfType();
-            $wrap = fn ($type) => Type::listOf($type);
-        } elseif ($type instanceof NonNull) {
-            $type = $type->getOfType();
-            $wrap = fn ($type) => Type::nonNull($type);
-        }
-
-        return [$type, $wrap];
-    }
 
     /**
      * {@inheritDoc}

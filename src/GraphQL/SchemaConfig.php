@@ -21,17 +21,19 @@ class SchemaConfig extends BaseSchemaConfig
      */
     public static function make(GraphQLManager $manager, array $options)
     {
+        $config = static::create($options);
+
         if (!empty($options['query'])) {
-            $options['query'] = new Query($manager, $options['query']);
+            $config->setQuery(new Query($manager, $options['query']));
         }
         if (!empty($options['mutation'])) {
-            $options['mutation'] = static::createMutation($manager, $options['mutation'], ['*' => true]);
+            $config->setMutation(static::createMutation($manager, $options['mutation'], ['*' => true]));
         }
         if (empty($options['typeLoader'])) {
-            $options['typeLoader'] = [$manager, 'getType'];
+            $config->setTypeLoader([$manager, 'getType']);
         }
 
-        return static::create($options);
+        return $config;
     }
 
     /**
@@ -43,20 +45,24 @@ class SchemaConfig extends BaseSchemaConfig
      */
     public static function rbac(GraphQLManager $manager, array $options, array $resources)
     {
+        $config = static::create($options);
+
         if (!empty($options['query'])) {
-            $options['query'] = new RbacQuery($manager, $options['query'], $resources);
+            $config->setQuery(new RbacQuery($manager, $options['query'], $resources));
         }
         if (!empty($options['mutation'])) {
-            $options['mutation'] = static::createMutation($manager, $options['mutation'], $resources);
+            $config->setMutation(static::createMutation($manager, $options['mutation'], $resources));
         }
         if (empty($options['typeLoader'])) {
-            $options['typeLoader'] = [$manager, 'getType'];
+            $config->setTypeLoader([$manager, 'getType']);
         }
 
-        return static::create($options);
+        return $config;
     }
 
     /**
+     * 根据文件获取具体的mutaion方法
+     *
      * @param GraphQLManager $manager
      * @param array $files
      * @param array $resources
@@ -74,7 +80,12 @@ class SchemaConfig extends BaseSchemaConfig
                     continue;
                 }
 
-                $fields[$name] = compact('type', 'args', 'resolve', 'description');
+                $fields[$name] = [
+                    'type'        => $type,
+                    'args'        => $args,
+                    'resolve'     => $resolve,
+                    'description' => $description,
+                ];
             }
         }
 
