@@ -6,6 +6,7 @@ use QT\GraphQL\Definition\Type;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Error\InvariantViolation;
 use QT\GraphQL\Definition\ObjectType;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\FieldDefinition;
 
@@ -17,11 +18,18 @@ use GraphQL\Type\Definition\FieldDefinition;
 trait WhitelistFields
 {
     /**
-     * 允许访问的字段
+     * 字段白名单
      *
      * @var array
      */
     protected $whitelist = [];
+
+    /**
+     * 允许访问的字段
+     * 
+     * @var array
+     */
+    protected $fields;
 
     /**
      * 设置可访问字段
@@ -61,21 +69,21 @@ trait WhitelistFields
 
             $fieldDef = $fields[$field];
 
-            [$type, $wrap] = $this->unwrap($fieldDef->getType());
-
-            if (!is_array($value) || !$type instanceof ObjectType) {
+            if (!is_array($value)) {
                 $results[$field] = $fieldDef;
                 continue;
             }
 
-            $name   = $prefix . ucfirst($field);
-            $func   = fn () => $this->defineAccessFields($type->getOriginalFields(), $value, $name);
-            $desc   = $fieldDef->description;
-            $struct = $this->getChildStruct($name, $func, $desc, $type->resolveFieldFn);
+            [$type, $wrap] = $this->unwrap($fieldDef->getType());
 
-            $results[$field] = FieldDefinition::create(array_merge($fields[$field]->config, [
-                'description' => $desc,
-                'type'        => $wrap($this->manager->setType($struct)),
+            if ($type instanceof UnionType) {
+                $type = $this->getUnionType($prefix . ucfirst($field), $type, $value);
+            } elseif ($type instanceof ObjectType) {
+                $type = $this->getFieldDefinition($prefix . ucfirst($field), $type, $value);
+            }
+
+            $results[$field] = FieldDefinition::create(array_merge($fieldDef->config, [
+                'type' => $wrap($this->manager->setType($type)),
             ]));
         }
 
@@ -104,66 +112,70 @@ trait WhitelistFields
     }
 
     /**
-     * 获取子级对象结构
-     *
      * @param string $name
-     * @param callable|array $fields
-     * @param string $desc
-     * @param callable $resolveFieldFn
+     * @param UnionType $unionType
+     * @param array $whitelist
+     * @return UnionType
      */
-    protected function getChildStruct(string $name, callable|array $fields, string $desc, callable $resolveFieldFn)
+    protected function getUnionType(string $name, UnionType $unionType, array $whitelist): UnionType
     {
-        return new ObjectType([
-            'name'         => $name,
-            'fields'       => $fields,
-            'description'  => $desc,
-            'resolveField' => $resolveFieldFn,
+        $types = [];
+        foreach ($unionType->getTypes() as $type) {
+            if (!isset($whitelist[$type->name]) || !is_array($whitelist[$type->name])) {
+                continue;
+            }
+
+            $newType = $this->getFieldDefinition($name . ucfirst($type->name), $type, $whitelist[$type->name]);
+
+            $types[$type->name] = $this->manager->setType($newType);
+        }
+
+        $resolveTypeFn = null;
+        if (!empty($unionType->config['resolveType'])) {
+            $resolveTypeFn = function ($value) use ($unionType, $types) {
+                $type = call_user_func($unionType->config['resolveType'], $value);
+
+                return $types[$type?->name];
+            };
+        }
+
+        return new UnionType([
+            'name'        => $name,
+            'types'       => array_values($types),
+            'resolveType' => $resolveTypeFn,
         ]);
     }
 
     /**
-     * {@inheritDoc}
+     * 根据字段白名单生成对象结构
      *
      * @param string $name
-     * @return FieldDefinition
+     * @param ObjectType $parentType
+     * @param array $whitelist
+     * @param string $prefix
+     * @return ObjectType
      */
-    public function getField(string $name): FieldDefinition
+    protected function getFieldDefinition(string $name, ObjectType $parentType, array $whitelist): ObjectType
     {
-        if (!isset($this->whitelist[$name])) {
-            throw new InvariantViolation(sprintf('Field "%s" is not defined for type "%s"', $name, $this->name));
-        }
+        $func = fn () => $this->defineAccessFields($parentType->getOriginalFields(), $whitelist, $name);
 
-        return parent::getField($name);
+        return $this->getChildStruct($name, $func, $parentType->resolveFieldFn);
     }
 
     /**
-     * {@inheritDoc}
+     * 获取子级对象结构
      *
      * @param string $name
-     * @return ?FieldDefinition
+     * @param callable|array $fields
+     * @param callable $resolveFieldFn
      */
-    public function findField(string $name): ?FieldDefinition
+    protected function getChildStruct(string $name, callable|array $fields, callable $resolveFieldFn)
     {
-        if (!isset($this->whitelist[$name])) {
-            return null;
-        }
-
-        return parent::findField($name);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param string $name
-     * @return bool
-     */
-    public function hasField(string $name): bool
-    {
-        if (!isset($this->whitelist[$name])) {
-            return false;
-        }
-
-        return parent::hasField($name);
+        return new ObjectType([
+            'name'         => $name,
+            'fields'       => $fields,
+            'resolveField' => $resolveFieldFn,
+        ]);
     }
 
     /**
@@ -173,18 +185,14 @@ trait WhitelistFields
      */
     public function getFields(): array
     {
-        $fields = parent::getFields();
+        if (empty($this->whitelist)) {
+            return parent::getFields();
+        }
 
-        return $this->defineAccessFields($fields, $this->whitelist, $this->name);
-    }
+        if (!isset($this->fields)) {
+            $this->fields = $this->defineAccessFields(parent::getFields(), $this->whitelist, $this->name);
+        }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return array
-     */
-    public function getFieldNames(): array
-    {
-        return array_intersect(parent::getFieldNames(), array_keys($this->whitelist));
+        return $this->fields;
     }
 }

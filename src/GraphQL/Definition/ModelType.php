@@ -14,6 +14,8 @@ use QT\GraphQL\Definition\ModelType as BaseModelType;
  */
 abstract class ModelType extends BaseModelType
 {
+    use WhitelistFields;
+
     /**
      * 是否启用导出类型
      *
