@@ -4,7 +4,6 @@ namespace QT\Foundation\GraphQL\Definition;
 
 use QT\GraphQL\Definition\Type;
 use GraphQL\Type\Definition\NonNull;
-use GraphQL\Error\InvariantViolation;
 use QT\GraphQL\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\ListOfType;
@@ -26,7 +25,7 @@ trait WhitelistFields
 
     /**
      * 允许访问的字段
-     * 
+     *
      * @var array
      */
     protected $fields;
@@ -67,14 +66,14 @@ trait WhitelistFields
                 continue;
             }
 
-            $fieldDef = $fields[$field];
+            [$type, $wrap] = $this->unwrap($fields[$field]->getType());
 
             if (!is_array($value)) {
-                $results[$field] = $fieldDef;
+                if (!$type instanceof UnionType && !$type instanceof ObjectType) {
+                    $results[$field] = $fields[$field];
+                }
                 continue;
             }
-
-            [$type, $wrap] = $this->unwrap($fieldDef->getType());
 
             if ($type instanceof UnionType) {
                 $type = $this->getUnionType($prefix . ucfirst($field), $type, $value);
@@ -82,7 +81,7 @@ trait WhitelistFields
                 $type = $this->getFieldDefinition($prefix . ucfirst($field), $type, $value);
             }
 
-            $results[$field] = FieldDefinition::create(array_merge($fieldDef->config, [
+            $results[$field] = FieldDefinition::create(array_merge($fields[$field]->config, [
                 'type' => $wrap($this->manager->setType($type)),
             ]));
         }
