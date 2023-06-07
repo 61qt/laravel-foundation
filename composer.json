@@ -10,7 +10,7 @@
         "firebase/php-jwt": "^5.3",
         "overtrue/easy-sms": "^1.3",
         "61qt/import": "^v1.4",
-        "61qt/laravel-graphql": "dev-feature/dataloader",
+        "61qt/laravel-graphql": "^v0.6",
         "61qt/laravel-filesystem": "^v0.14",
         "61qt/laravel-notifications": "^1.0"
     },
