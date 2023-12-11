@@ -61,7 +61,7 @@ class SchemaConfig extends BaseSchemaConfig
     }
 
     /**
-     * 根据文件获取具体的mutaion方法
+     * 根据文件获取具体的mutation方法
      *
      * @param GraphQLManager $manager
      * @param array $files

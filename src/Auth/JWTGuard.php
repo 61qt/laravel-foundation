@@ -4,6 +4,7 @@ namespace QT\Foundation\Auth;
 
 use Throwable;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Auth\GuardHelpers;
 use QT\Foundation\Exceptions\Error;
@@ -30,9 +31,9 @@ class JWTGuard implements Guard, StatefulGuard
     protected $request;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $algs = [];
+    protected $alg;
 
     /**
      * @var string
@@ -131,10 +132,11 @@ class JWTGuard implements Guard, StatefulGuard
 
     /**
      * JWTGuard constructor.
-     * @param Request          $request
+     *
+     * @param Request $request
      * @param JWTUserProvider $provider
-     * @param string           $guard
-     * @param array            $options
+     * @param string $guard
+     * @param array $options
      */
     public function __construct(
         Request $request,
@@ -148,11 +150,11 @@ class JWTGuard implements Guard, StatefulGuard
         $this->keyName  = $options['keyName'] ?? 'id';
         $this->inputKey = $options['inputKey'] ?? 'api_token';
 
-        if (empty($options['algs'])) {
+        if (empty($options['alg'])) {
             throw new Error('FORBIDDEN', '加密算法不能为空');
         }
 
-        $this->algs = $options['algs'];
+        $this->alg = $options['alg'];
 
         if (empty($options['guards'][$guard])) {
             throw new Error('FORBIDDEN', 'Guard配置错误');
@@ -212,8 +214,8 @@ class JWTGuard implements Guard, StatefulGuard
     /**
      * 获取用户
      *
-     * @return JWTSubject|Authenticatable|GraphQLAuthenticatable|null
      * @throws Error
+     * @return JWTSubject|Authenticatable|GraphQLAuthenticatable|null
      */
     public function user()
     {
@@ -254,13 +256,13 @@ class JWTGuard implements Guard, StatefulGuard
 
         return $this->user() !== null
             ? $this->user()->getAuthIdentifier()
-            : $this->getPayload()?->{ $this->keyName};
+            : $this->getPayload()?->{$this->keyName};
     }
 
     /**
      * 检查登录账户信息是否正确
      *
-     * @param  array $credentials
+     * @param array $credentials
      * @return bool
      */
     public function validate(array $credentials = [])
@@ -273,8 +275,8 @@ class JWTGuard implements Guard, StatefulGuard
     /**
      * 用给定的凭据对用户进行身份验证.
      *
-     * @param  array $credentials
-     * @param  bool  $remember
+     * @param array $credentials
+     * @param bool $remember
      * @return bool
      */
     public function attempt(array $credentials = [], $remember = false)
@@ -293,7 +295,7 @@ class JWTGuard implements Guard, StatefulGuard
      *
      * @param Authenticatable|JWTSubject $user
      * @param bool $remember
-     * @return string
+     * @return void
      */
     public function login(Authenticatable $user, $remember = false)
     {
@@ -317,17 +319,23 @@ class JWTGuard implements Guard, StatefulGuard
      *
      * @param mixed $id
      * @param bool $remember
-     * @return string
+     * @return \Illuminate\Contracts\Auth\Authenticatable|bool
      */
     public function loginUsingId($id, $remember = false)
     {
-        return $this->login($this->provider->retrieveById($id), $remember);
+        if (($user = $this->{$this}->provider->retrieveById($id)) !== null) {
+            $this->login($user, $remember);
+
+            return $user;
+        }
+
+        return false;
     }
 
     /**
      * Log a user into the application without sessions or cookies.
      *
-     * @param  array  $credentials
+     * @param array $credentials
      * @return bool
      */
     public function once(array $credentials = [])
@@ -344,7 +352,7 @@ class JWTGuard implements Guard, StatefulGuard
     /**
      * Log the given user ID into the application without sessions or cookies.
      *
-     * @param  mixed  $id
+     * @param mixed $id
      * @return \Illuminate\Contracts\Auth\Authenticatable|bool
      */
     public function onceUsingId($id)
@@ -392,8 +400,8 @@ class JWTGuard implements Guard, StatefulGuard
     /**
      * 检查登录凭证是否与数据库内一致.
      *
-     * @param  mixed  $user
-     * @param  array  $credentials
+     * @param mixed $user
+     * @param array $credentials
      * @return bool
      */
     protected function hasValidCredentials($user, $credentials)
@@ -414,8 +422,8 @@ class JWTGuard implements Guard, StatefulGuard
     /**
      * 刷新token
      *
-     * @return string
      * @throws Error
+     * @return string
      */
     public function refreshToken()
     {
@@ -439,27 +447,27 @@ class JWTGuard implements Guard, StatefulGuard
      * @param JWTSubject $user
      * @param int $ttl
      * @param int $refreshTtl
-     * @return string
      * @throws Error
+     * @return string
      */
     protected function generateToken(JWTSubject $user, $ttl, $refreshTtl)
     {
         $time    = time();
         $payload = array_merge($user->getJWTCustomClaims(), [
             // 签发时间
-            "iat" => $time - 3,
+            'iat'         => $time - 3,
             // 允许使用时间
-            "nbf" => $time - 3,
+            'nbf'         => $time - 3,
             // 过期时间
-            "exp" => $time + ($ttl * 60),
+            'exp'         => $time + ($ttl * 60),
             // 刷新token的过期时间
-            "refresh_ttl" => $time + $refreshTtl * 60,
+            'refresh_ttl' => $time + $refreshTtl * 60,
         ]);
 
         return JWT::encode(
             $payload,
             $this->key,
-            $this->algs[array_rand($this->algs)]
+            $this->alg,
         );
     }
 
@@ -473,7 +481,7 @@ class JWTGuard implements Guard, StatefulGuard
         if (!$this->payload) {
             $token = $this->getToken();
 
-            $this->payload = JWT::decode($token, $this->key, $this->algs);
+            $this->payload = JWT::decode($token, new Key($this->key, $this->alg));
         }
 
         return $this->payload;

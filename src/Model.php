@@ -3,27 +3,27 @@
 namespace QT\Foundation;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use QT\Foundation\Traits\Exportable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 /**
- * @method static Collection        findMany($id, $columns = ['*'])
- * @method static static|Collection find($id, $columns = ['*'])
- * @method static static|Collection findOrFail($id, $columns = ['*'])
- * @method static static|Collection findOrError($id, $errorMessage = '')
- * @method static static            findOrNew($id, $columns = ['*'])
- * @method static static            firstOrNew(array $attributes, array $values = [])
- * @method static static            firstOrCreate(array $attributes, array $values = [])
- * @method static static            updateOrCreate(array $attributes, array $values = [])
- * @method static static            first($columns = ['*'])
- * @method static static            firstOrFail($columns = ['*'])
- * @method static static            firstOr($columns = ['*'], Closure $callback = null)
- * @method static static            firstOrError($errorMessage = '')
- * @method static static            existsOrError($errorMessage = '')
- *
  * 通用model
+ *
+ * @method static static doesntExistOrError($errorMessage = '')
+ * @method static static existsOrError($errorMessage = '')
+ * @method static static|Collection find($id, $columns = ['*'])
+ * @method static Collection findMany($id, $columns = ['*'])
+ * @method static static|Collection findOrError($id, $errorMessage = '', $columns = ['*'])
+ * @method static static|Collection findOrFail($id, $columns = ['*'])
+ * @method static static findOrNew($id, $columns = ['*'])
+ * @method static static first($columns = ['*'])
+ * @method static static firstOr($columns = ['*'], Closure $callback = null)
+ * @method static static firstOrCreate(array $attributes, array $values = [])
+ * @method static static firstOrError($errorMessage = '', $columns = ['*'])
+ * @method static static firstOrFail($columns = ['*'])
+ * @method static static firstOrNew(array $attributes, array $values = [])
+ * @method static static updateOrCreate(array $attributes, array $values = [])
  *
  * @package QT\Foundation
  */
@@ -97,6 +97,7 @@ class Model extends EloquentModel
         }
 
         $offset = 0;
+
         while (true) {
             $data = array_slice($records, $offset, $limit);
 
@@ -113,7 +114,7 @@ class Model extends EloquentModel
     /**
      * 延迟查询数据
      *
-     * @param  $query
+     * @param $query
      * @param float|int $sleep
      * @param string $method
      * @return Collection|Model|null
@@ -146,7 +147,7 @@ class Model extends EloquentModel
      * @param integer $tries
      * @param string $method
      * @param float|int $sleep
-     * @return  Collection|Model|null
+     * @return Collection|Model|null
      */
     public static function tryQuery($query, int $tries = 3, string $method = 'get', float|int $sleep = 0.5)
     {
@@ -172,17 +173,21 @@ class Model extends EloquentModel
      * @param $baseQuery
      * @param integer $lastId
      * @param integer $limit
+     * @param string $orderBy
      * @return \Generator
      */
-    public static function getCursor($baseQuery, int $lastId = 0, int $limit = 1000)
+    public static function getCursor($baseQuery, int $lastId = 0, int $limit = 1000, string $orderBy = 'asc')
     {
-        $table   = $baseQuery->getModel()->getTable();
-        $keyName = $baseQuery->getModel()->getKeyName();
+        $table    = $baseQuery->getModel()->getTable();
+        $keyName  = $baseQuery->getModel()->getKeyName();
+        $operator = $orderBy === 'asc' ? '>' : '<';
 
         while (true) {
             $models = (clone $baseQuery)
-                ->where("{$table}.{$keyName}", '>', $lastId)
-                ->orderBy("{$table}.{$keyName}", 'asc')
+                ->when($lastId > 0, function ($query) use ($table, $keyName, $operator, $lastId) {
+                    $query->where("{$table}.{$keyName}", $operator, $lastId);
+                })
+                ->orderBy("{$table}.{$keyName}", $orderBy)
                 ->limit($limit)
                 ->get();
 
@@ -229,38 +234,5 @@ class Model extends EloquentModel
     protected function newBaseQueryBuilder()
     {
         return $this->bootMacros(parent::newBaseQueryBuilder());
-    }
-
-    /**
-     * 初始化query默认携带的macro方法.
-     *
-     * @param  Builder $query
-     * @return Builder
-     */
-    protected function bootMacros(Builder $query)
-    {
-        /**
-         * 减量操作,防止最小值小于0出现越界错误
-         *
-         * @param array $columns
-         */
-        $query->macro('safeDecrement', function ($columns) {
-            $values = [];
-            foreach ($columns as $column => $amount) {
-                if (!is_numeric($amount) || $amount <= 0) {
-                    continue;
-                }
-
-                $values[$column] = DB::raw("IF(`{$column}` >= {$amount}, `{$column}` - {$amount}, 0)");
-            }
-
-            if (!empty($values)) {
-                // macro时$this会指向Builder
-                /** @var Builder $this */
-                $this->update($values);
-            }
-        });
-
-        return $query;
     }
 }

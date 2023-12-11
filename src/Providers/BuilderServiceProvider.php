@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use QT\Foundation\Exceptions\Error;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class BuilderServiceProvider extends ServiceProvider
@@ -43,14 +44,18 @@ class BuilderServiceProvider extends ServiceProvider
          *
          * @param int|array $id
          * @param string $errorMessage
+         * @param array $columns
          */
-        EloquentBuilder::macro('findOrError', function ($id, $errorMessage = '数据不存在') {
+        EloquentBuilder::macro('findOrError', function ($id, $errorMessage = '数据不存在', $columns = ['*']) {
             /** @var EloquentBuilder $this */
-            $result = $this->find($id);
+            $result = $this->find($id, $columns);
+
+            $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
             if ((is_array($id) && $result->count() !== count($id)) || $result === null) {
                 throw new Error('NOT_FOUND', $errorMessage);
             }
+
             return $result;
         });
 
@@ -58,10 +63,12 @@ class BuilderServiceProvider extends ServiceProvider
          * 根据条件读取单条数据，如果数据不存在报错
          *
          * @param string $errorMessage
+         * @param array $columns
+         * @return static
          */
-        EloquentBuilder::macro('firstOrError', function ($errorMessage = '数据不存在') {
+        EloquentBuilder::macro('firstOrError', function ($errorMessage = '数据不存在', $columns = ['*']) {
             /** @var EloquentBuilder $this */
-            $model = $this->first();
+            $model = $this->first($columns);
 
             if ($model === null) {
                 throw new Error('NOT_FOUND', $errorMessage);
@@ -78,6 +85,16 @@ class BuilderServiceProvider extends ServiceProvider
         EloquentBuilder::macro('existsOrError', function ($errorMessage = '数据不存在') {
             /** @var EloquentBuilder $this */
             $this->existsOr(fn () => throw new Error('NOT_FOUND', $errorMessage));
+        });
+
+        /**
+         * 数据是否存在,存在抛出异常
+         *
+         * @param string $errorMessage
+         */
+        EloquentBuilder::macro('doesntExistOrError', function ($errorMessage = '数据已存在') {
+            /** @var EloquentBuilder $this */
+            $this->doesntExistOr(fn () => throw new Error('CONFLICT', $errorMessage));
         });
     }
 }

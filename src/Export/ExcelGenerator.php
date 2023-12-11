@@ -6,14 +6,12 @@ use Iterator;
 use Throwable;
 use QT\Foundation\Model;
 use QT\GraphQL\Resolver;
-use Box\Spout\Common\Type;
 use Illuminate\Support\Arr;
-use Box\Spout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Writer;
 use QT\GraphQL\Contracts\Context;
 use QT\GraphQL\Options\CursorOption;
-use Box\Spout\Writer\WriterInterface;
-use Box\Spout\Writer\Common\Creator\WriterFactory;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use OpenSpout\Writer\WriterInterface;
 
 /**
  * Excel生成器
@@ -156,7 +154,7 @@ class ExcelGenerator
             return $this->writer;
         }
 
-        return $this->writer = WriterFactory::createFromType(Type::XLSX);
+        return $this->writer = new Writer();
     }
 
     /**
@@ -310,6 +308,6 @@ class ExcelGenerator
      */
     protected function wrap(array $row): Row
     {
-        return WriterEntityFactory::createRowFromArray($row);
+        return Row::fromValues($row);
     }
 }

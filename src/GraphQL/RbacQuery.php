@@ -3,18 +3,17 @@
 namespace QT\Foundation\GraphQL;
 
 use QT\GraphQL\GraphQLManager;
-use QT\Foundation\GraphQL\Definition\ModelType;
 
 /**
  * 基于角色控制的可查询集合
- * 
+ *
  * @package QT\Foundation\GraphQL
  */
 class RbacQuery extends Query
 {
     /**
      * 可以当前用户请求的资源
-     * 
+     *
      * @var array
      */
     protected $resources = [];
@@ -48,7 +47,7 @@ class RbacQuery extends Query
             $this->registerType($type);
 
             if (method_exists($type, 'setWhitelistFields')) {
-                $type->setWhitelistFields($this->resources[$name]);
+                call_user_func([$type, 'setWhitelistFields'], $this->resources[$name]);
             }
         }
     }
