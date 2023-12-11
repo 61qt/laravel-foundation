@@ -323,7 +323,7 @@ class JWTGuard implements Guard, StatefulGuard
      */
     public function loginUsingId($id, $remember = false)
     {
-        if (($user = $this->{$this}->provider->retrieveById($id)) !== null) {
+        if (($user = $this->provider->retrieveById($id)) !== null) {
             $this->login($user, $remember);
 
             return $user;
