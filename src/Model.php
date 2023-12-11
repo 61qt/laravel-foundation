@@ -4,7 +4,6 @@ namespace QT\Foundation;
 
 use Illuminate\Support\Collection;
 use QT\Foundation\Traits\Exportable;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 /**
@@ -224,15 +223,5 @@ class Model extends EloquentModel
         }
 
         $query->whereKey($this->getKey())->safeDecrement($columns);
-    }
-
-    /**
-     * Get a new query builder instance for the connection.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function newBaseQueryBuilder()
-    {
-        return $this->bootMacros(parent::newBaseQueryBuilder());
     }
 }
