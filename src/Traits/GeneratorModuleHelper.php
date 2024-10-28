@@ -4,7 +4,6 @@ namespace QT\Foundation\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Doctrine\DBAL\Types\Types;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,26 +28,31 @@ trait GeneratorModuleHelper
      * @var array
      */
     protected $typeMaps = [
-        Types::INTEGER              => 'Type::int()',
-        Types::SMALLINT             => 'Type::int()',
-        Types::BOOLEAN              => 'Type::int()',
-        Types::BIGINT               => 'Type::bigint()',
-        Types::FLOAT                => 'Type::float()',
-        Types::STRING               => 'Type::string()',
-        Types::TEXT                 => 'Type::string()',
-        Types::ASCII_STRING         => 'Type::string()',
-        Types::ARRAY                => 'Type::json()',
-        Types::JSON                 => 'Type::json()',
-        Types::SIMPLE_ARRAY         => 'Type::json()',
-        Types::OBJECT               => 'Type::json()',
-        Types::DATETIME_MUTABLE     => 'Type::timestamp()',
-        Types::DATE_MUTABLE         => 'Type::timestamp()',
-        Types::DATE_IMMUTABLE       => 'Type::timestamp()',
-        Types::DATEINTERVAL         => 'Type::timestamp()',
-        Types::DATETIME_MUTABLE     => 'Type::timestamp()',
-        Types::DATETIME_IMMUTABLE   => 'Type::timestamp()',
-        Types::DATETIMETZ_MUTABLE   => 'Type::timestamp()',
-        Types::DATETIMETZ_IMMUTABLE => 'Type::timestamp()',
+        'boolean'                  => 'Type::int()',
+        'smallint'                 => 'Type::int()',
+        'integer'                  => 'Type::int()',
+        'bigint'                   => 'Type::bigint()',
+        'float'                    => 'Type::float()',
+        'smallfloat'               => 'Type::float()',
+        'string'                   => 'Type::string()',
+        'ascii_string'             => 'Type::string()',
+        'text'                     => 'Type::string()',
+        'json'                     => 'Type::json()',
+        'simple_array'             => 'Type::json()',
+        'date'                     => 'Type::timestamp()',
+        'date_immutable'           => 'Type::timestamp()',
+        'dateinterval'             => 'Type::timestamp()',
+        'datetime'                 => 'Type::timestamp()',
+        'datetime_immutable'       => 'Type::timestamp()',
+        'datetimetz'               => 'Type::timestamp()',
+        'datetimetz_immutable'     => 'Type::timestamp()',
+        'time'                     => 'Type::timestamp()',
+        'time_immutable'           => 'Type::timestamp()',
+        'binary'                   => 'Type::resource()',
+        'blob'                     => 'Type::resource()',
+        'decimal'                  => 'Type::string()',
+        'enum'                     => 'Type::mixed()',
+        'guid'                     => 'Type::string()',
     ];
 
     /**
