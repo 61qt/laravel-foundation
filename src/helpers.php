@@ -4,7 +4,7 @@ if (!function_exists('isDevelopEnv')) {
     /**
      * 判断是否开发环境
      *
-     * @return boolean
+     * @return bool
      */
     function isDevelopEnv(): bool
     {
@@ -29,11 +29,24 @@ if (!function_exists('array_to_key')) {
     /**
      * 将数组加上\t生成key
      * 避免join('', ['aa', 'bb', 'cc']) === join('', ['aabbcc'])
+     *
      * @param array $array
      * @return string
      */
     function array_to_key(array $array): string
     {
         return implode("\t", $array);
+    }
+}
+
+if (!function_exists('isDebug')) {
+    /**
+     * 判断是否debug模式
+     *
+     * @return bool
+     */
+    function isDebug(): bool
+    {
+        return config('app.debug');
     }
 }

@@ -86,7 +86,7 @@ class Model extends EloquentModel
      * 批量插入,防止占位符溢出
      *
      * @param array|Collection $records
-     * @param integer $limit
+     * @param int $limit
      * @return void
      */
     public static function safeInsert(array|Collection $records, int $limit = 500)
@@ -129,8 +129,8 @@ class Model extends EloquentModel
     /**
      * 查询单个model,支持失败重试机制
      *
-     * @param integer $id
-     * @param integer $tries
+     * @param int $id
+     * @param int $tries
      * @param float|int $sleep
      * @return Model|null
      */
@@ -143,7 +143,7 @@ class Model extends EloquentModel
      * 执行sql,支持失败重试机制
      *
      * @param $query
-     * @param integer $tries
+     * @param int $tries
      * @param string $method
      * @param float|int $sleep
      * @return Collection|Model|null
@@ -170,8 +170,8 @@ class Model extends EloquentModel
      * 流式获取
      *
      * @param $baseQuery
-     * @param integer $lastId
-     * @param integer $limit
+     * @param int $lastId
+     * @param int $limit
      * @param string $orderBy
      * @return \Generator
      */
@@ -180,8 +180,15 @@ class Model extends EloquentModel
         $table    = $baseQuery->getModel()->getTable();
         $keyName  = $baseQuery->getModel()->getKeyName();
         $operator = $orderBy === 'asc' ? '>' : '<';
+        // 数据量太大，会连接导致超时
+        $resultCount    = 0;
+        $reconnectLimit = 1000000;
 
         while (true) {
+            if ($resultCount >= $reconnectLimit) {
+                $resultCount = 0;
+                $baseQuery->getConnection()->reconnect();
+            }
             $models = (clone $baseQuery)
                 ->when($lastId > 0, function ($query) use ($table, $keyName, $operator, $lastId) {
                     $query->where("{$table}.{$keyName}", $operator, $lastId);
@@ -190,15 +197,14 @@ class Model extends EloquentModel
                 ->limit($limit)
                 ->get();
 
-            if ($models->isEmpty()) {
-                break;
-            }
-
             foreach ($models as $model) {
+                $lastId = $model->{$keyName};
                 yield $model;
             }
 
-            $lastId = $models->last()->{$keyName};
+            if ($models->count() !== $limit) {
+                break;
+            }
         }
     }
 

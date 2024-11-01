@@ -14,7 +14,7 @@ trait SingleSignOn
     /**
      * 获取白名单中的token
      *
-     * @param string|integer $id
+     * @param string|int $id
      * @return string|null
      */
     public function getTokenByWhitelist(string|int $id): ?string
@@ -26,8 +26,8 @@ trait SingleSignOn
      * 添加token到白名单
      *
      * @param string $token
-     * @param integer|string $id
-     * @param integer $ttl
+     * @param int|string $id
+     * @param int $ttl
      * @return void
      */
     public function addToWhitelist(string $token, int|string $id, int $ttl)
@@ -39,7 +39,7 @@ trait SingleSignOn
     /**
      * 删除token
      *
-     * @param string|integer $id
+     * @param string|int $id
      * @return void
      */
     public function invalidate(string|int $id)
@@ -50,16 +50,17 @@ trait SingleSignOn
     /**
      * 检查token是否在白名单中
      *
-     * @param string|integer $id
+     * @param string|int $id
      * @param string $token
-     * @return boolean
+     * @return bool
      */
     public function inWhitelist(string|int $id, string $token): bool
     {
         // 开发模式下不用验证白名单
-        if (config('app.debug') === true) {
+        if (isDebug()) {
             return true;
         }
+
         // 检查token是否与redis中的一致
         return $token === $this->getTokenByWhitelist($id);
     }
