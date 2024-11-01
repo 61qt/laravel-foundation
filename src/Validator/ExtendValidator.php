@@ -11,7 +11,7 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function phoneNumber(string $attribute, mixed $value): bool
     {
@@ -25,16 +25,12 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function telephone(string $attribute, mixed $value): bool
     {
         // 3+{7,8} | 4+{7,8} | {7,8} | 13000000000 ~ 19999999999
-        if ($value === null) {
-            return false;
-        }
-
-        return preg_match('/^1[3-9]\d{9}$|^\d{7,8}$|^0\d{2,3}-\d{7,8}$/', $value) === 1;
+        return $this->pregMatchWithString('/^1[3-9]\d{9}$|^\d{7,8}$|^0\d{2,3}-\d{7,8}$/', $value);
     }
 
     /**
@@ -44,7 +40,7 @@ class ExtendValidator
      * @param mixed $value
      * @param array $params
      * @param Validator $validator
-     * @return boolean
+     * @return bool
      */
     public function idNumber(string $attribute, mixed $value, array $params, Validator $validator): bool
     {
@@ -63,13 +59,13 @@ class ExtendValidator
      * @param string $attribute
      * @param mixed $value
      * @param array $params
-     * @return boolean
+     * @return bool
      */
     public function limitDecimal(string $attribute, mixed $value, array $params): bool
     {
         $regex = sprintf('/^[0-9]+(\.[0-9]{1,%d})?$/', $params[0]);
 
-        return preg_match($regex, $value);
+        return $this->pregMatchWithString($regex, $value);
     }
 
     /**
@@ -77,21 +73,17 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function mathPeTime(string $attribute, mixed $value): bool
     {
-        if (is_bool($value) || $value === null) {
-            return false;
-        }
-
         if (is_numeric($value) && intval($value) === 0) {
             return true;
         }
 
         $regex = '/^([0-9]|[0-5][0-9])(\.[0-5]|\.[0-5][0-9])?$/';
 
-        return preg_match($regex, $value);
+        return $this->pregMatchWithString($regex, $value);
     }
 
     /**
@@ -118,7 +110,7 @@ class ExtendValidator
      * @param string $attribute
      * @param mixed $value
      * @param array $params
-     * @return boolean
+     * @return bool
      */
     public function greaterThanEqual(string $attribute, mixed $value, array $params): bool
     {
@@ -147,11 +139,11 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function alphabetNum(string $attribute, mixed $value): bool
     {
-        return preg_match('/^[0-9a-zA-Z]+$/', $value) === 1;
+        return $this->pregMatchWithString('/^[0-9a-zA-Z]+$/', $value);
     }
 
     /**
@@ -159,11 +151,11 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function alphabetDash(string $attribute, mixed $value): bool
     {
-        return preg_match('/^[\pL\pM\pN\/]+$/u', $value) === 1;
+        return $this->pregMatchWithString('/^[\pL\pM\pN\/]+$/u', $value);
     }
 
     /**
@@ -171,16 +163,12 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function validateAlphaDashAndMiddleDot(string $attribute, mixed $value): bool
     {
-        if (!is_string($value) && !is_numeric($value)) {
-            return false;
-        }
-
         // https://www.compart.com/en/unicode/U+00B7
-        return preg_match('/^[·a-zA-Z\d\p{Han}]+$/u', $value) > 0;
+        return $this->pregMatchWithString('/^[·a-zA-Z\d\p{Han}]+$/u', $value);
     }
 
     /**
@@ -188,7 +176,7 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function validateAlphaNull(string $attribute, mixed $value): bool
     {
@@ -196,12 +184,8 @@ class ExtendValidator
             return true;
         }
 
-        if (!is_string($value) && !is_numeric($value)) {
-            return false;
-        }
-
         // https://www.compart.com/en/unicode/U+00B7
-        return preg_match('/^[\pL\pM\pN]+$/u', $value) > 0;
+        return $this->pregMatchWithString('/^[\pL\pM\pN]+$/u', $value);
     }
 
     /**
@@ -209,11 +193,11 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function isChinese(string $attribute, mixed $value): bool
     {
-        return preg_match("/^[\x{4e00}-\x{9fa5}]+$/u", $value) === 1;
+        return $this->pregMatchWithString("/^[\x{4e00}-\x{9fa5}]+$/u", $value);
     }
 
     /**
@@ -221,11 +205,11 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function password(string $attribute, mixed $value): bool
     {
-        return preg_match('/^[0-9a-zA-Z\x!$#%]+$/', $value) === 1;
+        return $this->pregMatchWithString('/^[0-9a-zA-Z\x!$#%]+$/', $value);
     }
 
     /**
@@ -233,11 +217,11 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function strictPassword(string $attribute, mixed $value): bool
     {
-        if (preg_match('/^[\w\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]{8,32}$/', $value) !== 1) {
+        if (!$this->pregMatchWithString('/^[\w\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]{8,32}$/', $value)) {
             return false;
         }
 
@@ -264,23 +248,23 @@ class ExtendValidator
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function validateStudentNo(string $attribute, mixed $value): bool
     {
-        return preg_match('/^[GL][0-9a-zA-Z]{18}$/', $value) === 1;
+        return $this->pregMatchWithString('/^[GL]\d{17}[\dX]$/i', $value);
     }
 
-     /**
+    /**
      * 匹配学前学籍号
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function validatePreschoolStudentNo(string $attribute, mixed $value): bool
     {
-        return preg_match('/^LG[0-9a-zA-Z]{18}$/', $value) === 1;
+        return $this->pregMatchWithString('/^LG\d{17}[\dX]$/i', $value);
     }
 
     /**
@@ -289,7 +273,7 @@ class ExtendValidator
      * @param string $attribute
      * @param mixed $value
      * @param array $params
-     * @return boolean
+     * @return bool
      */
     public function validateHtmlContentLength(string $attribute, mixed $value, array $params): bool
     {
@@ -315,14 +299,74 @@ class ExtendValidator
     }
 
     /**
+     * 限制小数位的报错提示
+     *
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array $params
+     * @return string
+     */
+    public function limitDecimalMsg(string $message, string $attribute, string $rule, array $params): string
+    {
+        return str_replace(':max', $params[0], $message);
+    }
+
+    /**
      * 匹配ISBN
      *
      * @param string $attribute
      * @param mixed $value
-     * @return boolean
+     * @return bool
      */
     public function validateISBN(string $attribute, mixed $value): bool
     {
-        return preg_match('/^[\d]{12}[\dX]$/', $value) === 1;
+        return $this->pregMatchWithString('/^[\d]{12}[\dX]$/', $value);
+    }
+
+    /**
+     * 校验是否是http或https的url
+     *
+     * @param string $attribute
+     * @param string|int $value
+     * @return bool
+     */
+    public function validateHttpUrl(string $attribute, string|int $value): bool
+    {
+        $patterns = [
+            '/^https?:\/\/',                     // http or https
+            '([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+',  // 域名部分
+            '[a-zA-Z]{2,}',                      // 顶级域名(.com,.cn 等)
+            '(:[0-9]{1,5})?',                    // 可选的端口号
+            '(\/[^\s]*)?',                       // 路径
+            '(\?[^\s]*)?',                       // 可选的查询字符串
+            '(\#[^\s]*)?$/',                     // 可选的片段
+        ];
+
+        return preg_match(implode('', $patterns), $value) === 1;
+    }
+
+    /**
+     * 正则校验表达式，排除非字符串的情况
+     *
+     * @param string $pattern
+     * @param mixed $subject
+     * @param array|null $matches
+     * @param int $flags
+     * @param int $offset
+     * @return bool
+     */
+    protected function pregMatchWithString(
+        string $pattern,
+        mixed $subject,
+        array &$matches = null,
+        int $flags = 0,
+        int $offset = 0
+    ): bool {
+        if (!is_scalar($subject) || is_bool($subject)) {
+            return false;
+        }
+
+        return preg_match($pattern, $subject, $matches, $flags, $offset) === 1;
     }
 }

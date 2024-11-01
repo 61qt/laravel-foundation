@@ -10,7 +10,7 @@ class CustomValidatorServiceProvider extends ServiceProvider
 {
     protected $extends = [
         ExtendValidator::class => [
-            'extend' => [
+            'extend'   => [
                 'phone_number'         => 'phoneNumber',
                 'id_number'            => 'idNumber',
                 'limit_decimal'        => 'limitDecimal',
@@ -26,11 +26,14 @@ class CustomValidatorServiceProvider extends ServiceProvider
                 'html_content_length'  => 'validateHtmlContentLength',
                 'preschool_student_no' => 'validatePreschoolStudentNo',
                 'isbn'                 => 'validateISBN',
+                'strict_pwd'           => 'strictPassword',
+                'http_url'             => 'validateHttpUrl',
             ],
             'replacer' => [
                 'html_content_length' => 'htmlContentLengthMsg',
                 'greater_than_equal'  => 'greaterThanEqualMsg',
                 'date_format'         => 'dateFormatMsg',
+                'limit_decimal'       => 'limitDecimalMsg',
             ],
         ],
     ];

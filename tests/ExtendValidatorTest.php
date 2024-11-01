@@ -221,6 +221,10 @@ class ExtendValidatorTest extends TestCase
             ['phone' => '020-12345', 'result' => false],
             ['phone' => '020_12345', 'result' => false],
             ['phone' => '020——12345', 'result' => false],
+            ['phone' => null, 'result' => false],
+            ['phone' => 'null', 'result' => false],
+            ['phone' => true, 'result' => false],
+            ['phone' => [], 'result' => false],
         ];
         $telephones = array_merge($this->phones, $telephones);
 
@@ -507,7 +511,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -559,7 +563,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -578,7 +582,7 @@ class ExtendValidatorTest extends TestCase
             ['data' => 'Test', 'result' => true],
             ['data' => 'QT123', 'result' => true],
             ['data' => 'root123', 'result' => true],
-            ['data' => 'stAr825',  'result' => true],
+            ['data' => 'stAr825', 'result' => true],
             ['data' => 'Abc!', 'result' => false],
             ['data' => '$', 'result' => false],
             ['data' => 'm J', 'result' => false],
@@ -593,7 +597,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -612,15 +616,18 @@ class ExtendValidatorTest extends TestCase
             ['data' => 'Test', 'result' => true],
             ['data' => 'QT123', 'result' => true],
             ['data' => 'root123', 'result' => true],
-            ['data' => 'stAr825',  'result' => true],
-            ['data' => 'stAr825/',  'result' => true],
-            ['data' => '测试stAr825/',  'result' => true],
-            ['data' => '测试のstAr825/',  'result' => true],
-            ['data' => '测试の테스트stAr825/',  'result' => true],
+            ['data' => 'stAr825', 'result' => true],
+            ['data' => 'stAr825/', 'result' => true],
+            ['data' => '测试stAr825/', 'result' => true],
+            ['data' => '测试のstAr825/', 'result' => true],
+            ['data' => '测试の테스트stAr825/', 'result' => true],
             ['data' => 'Abc!', 'result' => false],
             ['data' => '$', 'result' => false],
             ['data' => 'm J', 'result' => false],
             ['data' => '！', 'result' => false],
+            ['data' => true, 'result' => false],
+            ['data' => null, 'result' => false],
+            ['data' => [], 'result' => false],
         ];
 
         foreach ($values as $value) {
@@ -631,7 +638,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -650,11 +657,11 @@ class ExtendValidatorTest extends TestCase
             ['data' => 'Test', 'result' => true],
             ['data' => 'QT123', 'result' => true],
             ['data' => 'root123', 'result' => true],
-            ['data' => 'stAr825',  'result' => true],
-            ['data' => '测试·stAr825',  'result' => true],
-            ['data' => 'stAr825/',  'result' => false],
-            ['data' => '测试のstAr825',  'result' => false],
-            ['data' => '测试の테스트stAr825',  'result' => false],
+            ['data' => 'stAr825', 'result' => true],
+            ['data' => '测试·stAr825', 'result' => true],
+            ['data' => 'stAr825/', 'result' => false],
+            ['data' => '测试のstAr825', 'result' => false],
+            ['data' => '测试の테스트stAr825', 'result' => false],
             ['data' => 'Abc!', 'result' => false],
             ['data' => '$', 'result' => false],
             ['data' => 'm J', 'result' => false],
@@ -669,7 +676,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -688,15 +695,16 @@ class ExtendValidatorTest extends TestCase
             ['data' => 'Test', 'result' => true],
             ['data' => 'QT123', 'result' => true],
             ['data' => 'root123', 'result' => true],
-            ['data' => 'stAr825',  'result' => true],
-            ['data' => null,  'result' => true],
-            ['data' => '测试stAr825/',  'result' => false],
-            ['data' => '测试のstAr825',  'result' => true],
-            ['data' => '测试の테스트stAr825',  'result' => true],
+            ['data' => 'stAr825', 'result' => true],
+            ['data' => null, 'result' => true],
+            ['data' => '测试stAr825/', 'result' => false],
+            ['data' => '测试のstAr825', 'result' => true],
+            ['data' => '测试の테스트stAr825', 'result' => true],
             ['data' => 'Abc!', 'result' => false],
             ['data' => '$', 'result' => false],
             ['data' => 'm J', 'result' => false],
             ['data' => '！', 'result' => false],
+            ['data' => false, 'result' => false],
         ];
 
         foreach ($values as $value) {
@@ -707,7 +715,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -726,10 +734,10 @@ class ExtendValidatorTest extends TestCase
             ['data' => 'Test', 'result' => false],
             ['data' => 'QT123', 'result' => false],
             ['data' => 'root123', 'result' => false],
-            ['data' => 'stAr825',  'result' => false],
-            ['data' => '测试stAr825/',  'result' => false],
-            ['data' => '测试のstAr825',  'result' => false],
-            ['data' => '测试の테스트stAr825',  'result' => false],
+            ['data' => 'stAr825', 'result' => false],
+            ['data' => '测试stAr825/', 'result' => false],
+            ['data' => '测试のstAr825', 'result' => false],
+            ['data' => '测试の테스트stAr825', 'result' => false],
             ['data' => 'Abc!', 'result' => false],
             ['data' => '$', 'result' => false],
             ['data' => 'm J', 'result' => false],
@@ -825,7 +833,9 @@ class ExtendValidatorTest extends TestCase
             ['data' => 'G321002192608174373', 'result' => true],
             ['data' => 'L321002192608174373', 'result' => true],
             ['data' => 'L32100219260817437X', 'result' => true],
-            ['data' => 'L32100219260817437a', 'result' => true],
+            ['data' => 'g321002192608174373', 'result' => true],
+            ['data' => 'l32100219260817437X', 'result' => true],
+            ['data' => 'L32100219260817437a', 'result' => false],
             ['data' => 'LG321002192608174373', 'result' => false],
             ['data' => '321002192608174323', 'result' => false],
             ['data' => '32100219260817432Xa', 'result' => false],
@@ -854,6 +864,8 @@ class ExtendValidatorTest extends TestCase
         $values = [
             ['data' => 'LG321002192608174373', 'result' => true],
             ['data' => 'LG32100219260817437X', 'result' => true],
+            ['data' => 'Lg321002192608174373', 'result' => true],
+            ['data' => 'lg32100219260817437x', 'result' => true],
             ['data' => 'L321002192608174373', 'result' => false],
             ['data' => 'G321002192608174373', 'result' => false],
             ['data' => '321002192608174323', 'result' => false],
@@ -870,7 +882,7 @@ class ExtendValidatorTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @depends testValidationFactory
      *
      * @param Factory $factory
@@ -894,6 +906,39 @@ class ExtendValidatorTest extends TestCase
         foreach ($values as $value) {
             $validator = $factory->make($value, [
                 'data' => 'isbn',
+            ]);
+            $this->assertTrue($validator->fails() !== $value['result']);
+        }
+    }
+
+    /**
+     * @depends testValidationFactory
+     *
+     * @param Factory $factory
+     * @return void
+     */
+    public function testValidateHttpUrl(Factory $factory)
+    {
+        $factory->extend('http_url', [new ExtendValidator(), 'validateHttpUrl']);
+
+        $values = [
+            ['data' => 'https://example.com', 'result' => true],
+            ['data' => 'http://example.com/', 'result' => true],
+            ['data' => 'example.com', 'result' => false],
+            ['data' => 'http://', 'result' => false],
+            ['data' => 'http://example.com!@#$', 'result' => false],
+            ['data' => 'http://example.com:444', 'result' => true],
+            ['data' => 'http://example.com?query=param', 'result' => true],
+            ['data' => '978753273653', 'result' => false],
+            ['data' => '测试!', 'result' => false],
+            ['data' => 'http://example.com:8080/path/to/resource?query=param#fragment', 'result' => true],
+            ['data' => 'http://example.com:8080/path/to/resource?query=测试&test=test#fragment', 'result' => true],
+            ['data' => 'https://exmple.cn/callback?redirect_uri=https%3A%2F%2Fwww.example.cn%2Fcommunity_m%2Fmy_article%2Fcreated%3FstudioId%3D79&client_type=api_m', 'result' => true],
+        ];
+
+        foreach ($values as $value) {
+            $validator = $factory->make($value, [
+                'data' => 'http_url',
             ]);
             $this->assertTrue($validator->fails() !== $value['result']);
         }
