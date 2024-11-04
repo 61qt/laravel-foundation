@@ -17,7 +17,6 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use QT\Import\Exceptions\ValidationException as ImportValidationException;
 
 /**
  * 异常处理
@@ -51,7 +50,7 @@ class Handler extends ExceptionHandler
     /**
      * Determine if the exception is in the "do not report" list.
      *
-     * @param  \Throwable  $e
+     * @param Throwable $e
      * @return bool
      */
     protected function shouldntReport(Throwable $e)
@@ -87,9 +86,9 @@ class Handler extends ExceptionHandler
     /**
      * Prepare a JSON response for the given exception.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @param Throwable $e
+     * @return JsonResponse
      */
     protected function prepareJsonResponse($request, Throwable $e)
     {
@@ -104,8 +103,8 @@ class Handler extends ExceptionHandler
     /**
      * Convert the given exception to an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
+     * @param Request $request
+     * @param Throwable $e
      * @return array
      */
     protected function convertException($request, Throwable $e)
@@ -128,21 +127,22 @@ class Handler extends ExceptionHandler
 
             case $e instanceof AuthenticationException:
                 $code = 401;
-                $msg  = "用户认证失败,请重新登录";
+                $msg  = '用户认证失败,请重新登录';
                 break;
 
             case $e instanceof NotFoundHttpException:
             case $e instanceof ModelNotFoundException:
-                $msg  = !isDevelopEnv() ? "访问的数据不存在" : $msg;
+                $msg  = !isDevelopEnv() ? '访问的数据不存在' : $msg;
                 $code = 404;
                 break;
 
             case $e instanceof TypeNotFoundException:
                 $code = $request->user() === null ? 401 : 403;
+                $msg  = isDevelopEnv() ? $e->getMessage() : '没权限访问';
                 break;
 
             case $e instanceof MethodNotAllowedHttpException:
-                $msg  = "http方法不存在";
+                $msg  = 'http方法不存在';
                 $code = 405;
                 break;
 
@@ -151,11 +151,11 @@ class Handler extends ExceptionHandler
                 break;
 
             case $e instanceof PostTooLargeException:
-                $msg  = "上传文件大小超过" . ini_get('post_max_size');
+                $msg  = '上传文件大小超过' . ini_get('post_max_size');
                 $code = 413;
                 break;
 
-            case $e instanceof ImportValidationException:
+            case $e instanceof UnexpectedValueException:
                 $code = 400;
                 $msg  = $e->getMessage();
                 break;
@@ -163,7 +163,7 @@ class Handler extends ExceptionHandler
             default:
                 // 除了特定错误,其他错误信息在正式环境屏蔽
                 if (!isDevelopEnv()) {
-                    $msg = "系统繁忙";
+                    $msg = '系统繁忙';
                 }
                 Log::error($e->getMessage());
                 break;

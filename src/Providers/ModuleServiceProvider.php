@@ -63,15 +63,13 @@ class ModuleServiceProvider extends ServiceProvider
 
             $commands = [];
             foreach (new FilesystemIterator($path) as $file) {
-                if (!$file->isFile() || !$file->getExtension() === 'php') {
-                    continue;
+                if ($file->isFile() && $file->getExtension() === 'php') {
+                    $commands[] = sprintf(
+                        '%s\\Commands\\%s',
+                        $config['namespace'],
+                        substr($file->getFilename(), 0, -4)
+                    );
                 }
-
-                $commands[] = sprintf(
-                    "%s\\Commands\\%s",
-                    $config['namespace'],
-                    substr($file->getFilename(), 0, -4)
-                );
             }
 
             $this->commands($commands);

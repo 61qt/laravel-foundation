@@ -42,14 +42,14 @@ class BuilderServiceProvider extends ServiceProvider
         /**
          * 按照主键id读取数据，如果数据不存在报错
          *
-         * @param int|array $id
+         * @param int|array|Arrayable $id
          * @param string $errorMessage
          * @param array $columns
+         * @return static
          */
         EloquentBuilder::macro('findOrError', function ($id, $errorMessage = '数据不存在', $columns = ['*']) {
             /** @var EloquentBuilder $this */
             $result = $this->find($id, $columns);
-
             $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
             if ((is_array($id) && $result->count() !== count($id)) || $result === null) {
