@@ -2,12 +2,12 @@
 
 namespace DummyNamespace;
 
-use QT\Import\Task;
+use DummyParentFullName;
 use QT\Import\Rules\Unique;
 use QT\Import\Rules\Exists;
 use QT\Foundation\Traits\ImportTaskConstruct;
 
-class DummyClass extends Task
+class DummyClass extends DummyParent
 {
     use ImportTaskConstruct;
 

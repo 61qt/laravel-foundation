@@ -28,31 +28,31 @@ trait GeneratorModuleHelper
      * @var array
      */
     protected $typeMaps = [
-        'boolean'                  => 'Type::int()',
-        'smallint'                 => 'Type::int()',
-        'integer'                  => 'Type::int()',
-        'bigint'                   => 'Type::bigint()',
-        'float'                    => 'Type::float()',
-        'smallfloat'               => 'Type::float()',
-        'string'                   => 'Type::string()',
-        'ascii_string'             => 'Type::string()',
-        'text'                     => 'Type::string()',
-        'json'                     => 'Type::json()',
-        'simple_array'             => 'Type::json()',
-        'date'                     => 'Type::timestamp()',
-        'date_immutable'           => 'Type::timestamp()',
-        'dateinterval'             => 'Type::timestamp()',
-        'datetime'                 => 'Type::timestamp()',
-        'datetime_immutable'       => 'Type::timestamp()',
-        'datetimetz'               => 'Type::timestamp()',
-        'datetimetz_immutable'     => 'Type::timestamp()',
-        'time'                     => 'Type::timestamp()',
-        'time_immutable'           => 'Type::timestamp()',
-        'binary'                   => 'Type::resource()',
-        'blob'                     => 'Type::resource()',
-        'decimal'                  => 'Type::string()',
-        'enum'                     => 'Type::mixed()',
-        'guid'                     => 'Type::string()',
+        'boolean'              => 'Type::int()',
+        'smallint'             => 'Type::int()',
+        'integer'              => 'Type::int()',
+        'bigint'               => 'Type::bigint()',
+        'float'                => 'Type::float()',
+        'smallfloat'           => 'Type::float()',
+        'string'               => 'Type::string()',
+        'ascii_string'         => 'Type::string()',
+        'text'                 => 'Type::string()',
+        'json'                 => 'Type::json()',
+        'simple_array'         => 'Type::json()',
+        'date'                 => 'Type::timestamp()',
+        'date_immutable'       => 'Type::timestamp()',
+        'dateinterval'         => 'Type::timestamp()',
+        'datetime'             => 'Type::timestamp()',
+        'datetime_immutable'   => 'Type::timestamp()',
+        'datetimetz'           => 'Type::timestamp()',
+        'datetimetz_immutable' => 'Type::timestamp()',
+        'time'                 => 'Type::timestamp()',
+        'time_immutable'       => 'Type::timestamp()',
+        'binary'               => 'Type::resource()',
+        'blob'                 => 'Type::resource()',
+        'decimal'              => 'Type::string()',
+        'enum'                 => 'Type::mixed()',
+        'guid'                 => 'Type::string()',
     ];
 
     /**
@@ -70,7 +70,6 @@ STRING;
     /**
      * Get the written module.
      *
-     * @param  string  $name
      * @return string
      */
     protected function getModule()
@@ -85,7 +84,7 @@ STRING;
     /**
      * Get the destination class path.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
     protected function getPath($name)
@@ -130,8 +129,8 @@ STRING;
     /**
      * Build the graphql data structure replacement values.
      *
-     * @param  array  $replace
-     * @param  string $table
+     * @param array $replace
+     * @param string $table
      * @return array
      */
     protected function buildDataStructureReplacements(array $replace, string $table): array
@@ -162,13 +161,14 @@ STRING;
     /**
      * Build class extends parent
      *
-     * @param  array  $replace
-     * @param  string $table
+     * @param array $replace
+     * @param string $mustImplement
+     * @param array $parents
      * @return array
      */
     protected function buildClassParents(array $replace, string $mustImplement, array $parents): array
     {
-        $parents = array_merge($this->option('parent_class') ?? [], $parents);
+        $parents = array_merge(Arr::wrap($this->option('parent_class')) ?? [], $parents);
 
         foreach ($parents as $parent) {
             if (!class_exists($parent)) {
