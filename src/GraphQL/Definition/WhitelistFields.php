@@ -75,10 +75,11 @@ trait WhitelistFields
                 continue;
             }
 
+            $typeName = $this->getTypeName($prefix, $field);
             if ($type instanceof UnionType) {
-                $type = $this->getUnionType($prefix . ucfirst($field), $type, $value);
+                $type = $this->getUnionType($typeName, $type, $value);
             } elseif ($type instanceof ObjectType) {
-                $type = $this->getFieldDefinition($prefix . ucfirst($field), $type, $value);
+                $type = $this->getFieldDefinition($typeName, $type, $value);
             }
 
             $results[$field] = FieldDefinition::create(array_merge($fields[$field]->config, [
@@ -124,7 +125,7 @@ trait WhitelistFields
                 continue;
             }
 
-            $newType = $this->getFieldDefinition($name . ucfirst($type->name), $type, $whitelist[$type->name]);
+            $newType = $this->getFieldDefinition($this->getTypeName($name, $type->name), $type, $whitelist[$type->name]);
 
             $types[$type->name] = $this->manager->setType($newType);
         }
@@ -193,5 +194,17 @@ trait WhitelistFields
         }
 
         return $this->fields;
+    }
+
+    /**
+     * 获取type的名称，需要模块内唯一，typeName+relation的typeName
+     *
+     * @param string $prefix
+     * @param string $subType
+     * @return string
+     */
+    protected function getTypeName(string $prefix, string $subType): string
+    {
+        return $prefix . ucfirst($subType);
     }
 }
