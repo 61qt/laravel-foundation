@@ -72,7 +72,7 @@ STRING;
      *
      * @return string
      */
-    protected function getModule()
+    protected function getModule(): string
     {
         if ($this->module !== null) {
             return $this->module;
@@ -137,10 +137,9 @@ STRING;
     {
         // 获取表字段以及字段
         $dataStructure = [];
-        foreach (Schema::getColumnListing($table) as $column) {
-            $column      = Schema::getConnection()->getDoctrineColumn($table, $column);
-            $columnType  = $column->getType()->getName();
-            $description = $column->getComment() ?: $column->getName();
+        foreach (Schema::getColumns($table) as $column) {
+            $columnType  = $column['type_name'];
+            $description = $column['comment'] ?: $column['name'];
 
             if (empty($this->typeMaps[$columnType])) {
                 continue;
@@ -148,7 +147,7 @@ STRING;
 
             $dataStructure[] = str_replace(
                 ['Column', 'Type', 'Description'],
-                [$column->getName(), $this->typeMaps[$columnType], $description],
+                [$column['name'], $this->typeMaps[$columnType], $description],
                 $this->columnDataStructure
             );
         }
@@ -168,7 +167,7 @@ STRING;
      */
     protected function buildClassParents(array $replace, string $mustImplement, array $parents): array
     {
-        $parents = array_merge(Arr::wrap($this->option('parent_class')) ?? [], $parents);
+        $parents = array_merge($this->option('parent_class') ?? [], $parents);
 
         foreach ($parents as $parent) {
             if (!class_exists($parent)) {
@@ -206,8 +205,8 @@ STRING;
 
         // 处理表名最后的`表`字
         $tableName = Arr::first($comments)->table_comment ?? '';
-        if (!empty(preg_match('/表$/', $tableName, $miss))) {
-            $tableName = mb_substr($tableName, 0, -1);
+        if (str_ends_with($tableName, '表')) {
+            $tableName = rtrim($tableName, '表');
         }
 
         return array_merge($replace, [

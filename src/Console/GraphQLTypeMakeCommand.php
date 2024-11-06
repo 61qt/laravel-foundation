@@ -53,11 +53,10 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         Types::STRING       => 'string',
         Types::TEXT         => 'string',
         Types::ASCII_STRING => 'string',
+        'varchar'           => 'string',
     ];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $likeFields = [
         'name',
     ];
@@ -75,7 +74,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -86,7 +85,7 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
     protected function buildClass($name)
@@ -115,11 +114,11 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     /**
      * Build the resolver replacement values.
      *
-     * @param  array  $replace
-     * @param  string $type
+     * @param array $replace
+     * @param string $type
      * @return array
      */
-    protected function buildResolverReplacements(array $replace, $type)
+    protected function buildResolverReplacements(array $replace, string $type): array
     {
         $resolverClass = $this->parseType($type);
 
@@ -138,16 +137,20 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     /**
      * Build the rules replacement values.
      *
-     * @param  array  $replace
+     * @param array $replace
+     * @param string $table
      * @return array
      */
-    protected function buildFilterReplacements(array $replace, $table)
+    protected function buildFilterReplacements(array $replace, string $table): array
     {
-        $schema = Schema::getConnection()->getDoctrineSchemaManager();
-        $table  = $schema->listTableDetails($table);
+        $columns = [];
+        // 获取表字段以及字段
+        foreach (Schema::getColumns($table) as $column) {
+            $columns[$column['name']] = $column;
+        }
 
         $func = function ($filters, $column, $type, $operators) {
-            $name   = $column->getName();
+            $name   = $column['name'];
             $method = $this->filterMaps[$type];
             $filter = "->{$method}('{$name}', {$operators})";
 
@@ -156,15 +159,16 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
 
         // 根据字典生成默认筛选条件
         $filters = collect();
-        foreach ($table->getColumns() as $column) {
+
+        foreach ($columns as $column) {
             $operators = null;
-            $type      = $column->getType()->getName();
+            $type      = $column['type_name'];
             if ($type === Types::BOOLEAN) {
                 $operators = "['=', 'in', '!=']";
             }
 
             foreach ($this->likeFields as $field) {
-                if (Str::contains($column->getName(), $field)) {
+                if (Str::contains($column['name'], $field)) {
                     $operators = "['like']";
                 }
             }
@@ -177,16 +181,15 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         }
 
         // 根据索引生成默认筛选条件
-        foreach ($table->getIndexes() as $index) {
-            foreach ($index->getColumns() as $column) {
-                $column = $table->getColumn($column);
-                $type   = $column->getType()->getName();
+        foreach (Schema::getIndexes($table) as $index) {
+            foreach ($index['columns'] as $column) {
+                $column = $columns[$column];
 
-                if (empty($this->filterMaps[$type])) {
+                if (empty($this->filterMaps[$column['type_name']])) {
                     continue;
                 }
 
-                $func($filters, $column, $type, "['=', 'in']");
+                $func($filters, $column, $column['type_name'], "['=', 'in']");
             }
         }
 
@@ -206,10 +209,10 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
     /**
      * Get the fully-qualified resolver class name.
      *
-     * @param  string  $type
+     * @param string $type
      * @return string
      */
-    protected function parseType($type)
+    protected function parseType(string $type): string
     {
         if (preg_match('([^A-Za-z0-9_/\\\\])', $type)) {
             throw new InvalidArgumentException('Model name contains invalid characters.');
@@ -225,4 +228,3 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         return $resolver;
     }
 }
-

@@ -70,7 +70,7 @@ class ResolverMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -81,7 +81,7 @@ class ResolverMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
     protected function buildClass($name)
@@ -102,7 +102,7 @@ class ResolverMakeCommand extends GeneratorCommand
         $replace = $this->buildTableCommentReplacements($replace, $table, 'DummyModelComment');
         $replace = $this->buildClassParents($replace, Resolver::class, [
             \App\Resolvers\Resolver::class,
-            \QT\GraphQL\Resolver::class,
+            Resolver::class,
         ]);
 
         return str_replace(
@@ -115,10 +115,11 @@ class ResolverMakeCommand extends GeneratorCommand
     /**
      * Build the model replacement values.
      *
-     * @param  array  $replace
+     * @param array $replace
+     * @param string $model
      * @return array
      */
-    protected function buildModelReplacements(array $replace, $model)
+    protected function buildModelReplacements(array $replace, string $model): array
     {
         $modelClass = $this->parseModel($model);
 
@@ -144,10 +145,12 @@ class ResolverMakeCommand extends GeneratorCommand
     /**
      * Build the rules replacement values.
      *
-     * @param  array  $replace
+     * @param array $replace
+     * @param string $table
+     * @param array $ruleColumns
      * @return array
      */
-    protected function buildRulesReplacements(array $replace, $table, $ruleColumns)
+    protected function buildRulesReplacements(array $replace, string $table, array $ruleColumns): array
     {
         if (empty($ruleColumns)) {
             return $replace;
@@ -155,8 +158,8 @@ class ResolverMakeCommand extends GeneratorCommand
 
         $columns = [];
         // 获取表字段以及字段
-        foreach (Schema::getColumnListing($table) as $column) {
-            $columns[$column] = Schema::getConnection()->getDoctrineColumn($table, $column);
+        foreach (Schema::getColumns($table) as $column) {
+            $columns[$column['name']] = $column;
         }
 
         $rules = [];
@@ -168,28 +171,30 @@ class ResolverMakeCommand extends GeneratorCommand
             $rule   = [];
             $column = $columns[$ruleColumn];
 
-            if (in_array($column->getName(), [
+            if (in_array($column['name'], [
                 'created_at', 'updated_at', 'deleted_at',
             ])) {
                 continue;
             }
 
-            if ($column->getNotnull()) {
+            if (!$column['nullable']) {
                 $rule[] = 'required';
             }
 
-            if (array_key_exists($column->getType()->getName(), $this->ruleMaps)) {
-                $rule[] = $this->ruleMaps[$column->getType()->getName()];
+            if (array_key_exists($column['type_name'], $this->ruleMaps)) {
+                $rule[] = $this->ruleMaps[$column['type_name']];
             }
 
-            if ($column->getType()->getName() === Types::STRING) {
-                $rule[] = "max:{$column->getLength()}";
+            if ($column['type_name'] === Types::STRING) {
+                if (preg_match('([A-Za-z]+\(([0-9]+)\))', 'string(11)', $match) === 1) {
+                    $rule[] = "max:{$match[2]}";
+                }
             }
 
-            if (Str::contains($column->getName(), ['is_', 'status'])) {
+            if (Str::contains($column['name'], ['is_', 'status'])) {
                 $rule[] = "in_dict:{$table}";
             } elseif ($column->getUnsigned()) {
-                $rule[] = "min:0";
+                $rule[] = 'min:0';
             }
 
             $rule    = implode('|', $rule);
@@ -202,10 +207,10 @@ class ResolverMakeCommand extends GeneratorCommand
     /**
      * Get the fully-qualified model class name.
      *
-     * @param  string  $model
+     * @param string $model
      * @return string
      */
-    protected function parseModel($model)
+    protected function parseModel(string $model): string
     {
         if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
             throw new InvalidArgumentException('Model name contains invalid characters.');
@@ -226,7 +231,7 @@ class ResolverMakeCommand extends GeneratorCommand
      *
      * @return array
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return array_merge($this->getModuleOptions(), [
             ['rules', null, InputOption::VALUE_OPTIONAL, 'rules'],
