@@ -10,7 +10,7 @@ use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
 
 /**
  * Laravel Model 生成脚本
- * 
+ *
  * @package QT\Foundation\Console
  */
 class ModelMakeCommand extends BaseModelMakeCommand
@@ -31,13 +31,13 @@ class ModelMakeCommand extends BaseModelMakeCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/model.stub';
+        return __DIR__ . '/stubs/model.stub';
     }
 
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -48,30 +48,38 @@ class ModelMakeCommand extends BaseModelMakeCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
     protected function buildClass($name)
     {
-        $table   = Str::snake(Str::pluralStudly($this->argument('name')));
-        $columns = collect(Schema::getColumnListing($table))
-            ->filter(function ($column) {
-                return !in_array($column, [
-                    'id', 'created_at', 'updated_at', 'deleted_at',
-                ]);
-            })
-            ->map(function ($column) {
-                return str_pad('', 8, ' ', STR_PAD_LEFT) . "'{$column}',";
-            });
+        $table      = Str::snake(Str::pluralStudly($this->argument('name')));
+        $indent     = str_repeat(' ', 8);
+        $timestamps = 'public $timestamps = false;';
+        $columns    = [];
 
-        $replace = ['DummyColumns' => $columns->implode("\r"), 'DummyTable' => $table];
+        foreach (Schema::getColumnListing($table) as $column) {
+            if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
+                $column === 'updated_at' && $timestamps = '';
+            } else {
+                $columns[] = "{$indent}'{$column}',";
+            }
+        }
+
+        $replace = [
+            'DummyColumns'    => implode("\r", $columns),
+            'DummyTable'      => $table,
+            'DummyTimestamps' => $timestamps,
+        ];
         $replace = $this->buildClassParents($replace, Model::class, [
             \App\Models\Model::class,
             \QT\Foundation\Model::class,
         ]);
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            parent::buildClass($name)
         );
     }
 }

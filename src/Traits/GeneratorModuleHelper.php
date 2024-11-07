@@ -2,7 +2,6 @@
 
 namespace QT\Foundation\Traits;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -29,16 +28,28 @@ trait GeneratorModuleHelper
      */
     protected $typeMaps = [
         'boolean'              => 'Type::int()',
+        'int'                  => 'Type::int()',
         'smallint'             => 'Type::int()',
-        'integer'              => 'Type::int()',
+        'mediumint'            => 'Type::int()',
+        'tinyint'              => 'Type::int()',
         'bigint'               => 'Type::bigint()',
         'float'                => 'Type::float()',
         'smallfloat'           => 'Type::float()',
-        'string'               => 'Type::string()',
-        'ascii_string'         => 'Type::string()',
+        'double'               => 'Type::float()',
+        'real'                 => 'Type::float()',
+        'decimal'              => 'Type::string()',
+        'numeric'              => 'Type::string()',
+        'guid'                 => 'Type::string()',
+        'year'                 => 'Type::string()',
         'text'                 => 'Type::string()',
+        'char'                 => 'Type::string()',
+        'varchar'              => 'Type::string()',
+        'tinytext'             => 'Type::string()',
+        'mediumtext'           => 'Type::string()',
+        'longtext'             => 'Type::string()',
         'json'                 => 'Type::json()',
         'simple_array'         => 'Type::json()',
+        'set'                  => 'Type::json()',
         'date'                 => 'Type::timestamp()',
         'date_immutable'       => 'Type::timestamp()',
         'dateinterval'         => 'Type::timestamp()',
@@ -48,11 +59,14 @@ trait GeneratorModuleHelper
         'datetimetz_immutable' => 'Type::timestamp()',
         'time'                 => 'Type::timestamp()',
         'time_immutable'       => 'Type::timestamp()',
+        'timestamp'            => 'Type::timestamp()',
         'binary'               => 'Type::resource()',
         'blob'                 => 'Type::resource()',
-        'decimal'              => 'Type::string()',
+        'longblob'             => 'Type::resource()',
+        'mediumblob'           => 'Type::resource()',
+        'tinyblob'             => 'Type::resource()',
+        'varbinary'            => 'Type::resource()',
         'enum'                 => 'Type::mixed()',
-        'guid'                 => 'Type::string()',
     ];
 
     /**
@@ -195,16 +209,16 @@ STRING;
      */
     protected function buildTableCommentReplacements(array $replace, string $table, string $replaceKey): array
     {
-        $comments = DB::select(
+        $comments = DB::selectOne(
             sprintf(
-                'SELECT table_comment FROM information_schema.tables WHERE table_schema = \'%s\' AND table_name = \'%s\'',
+                'SELECT `table_comment` FROM `information_schema`.`tables` WHERE `table_schema` = \'%s\' AND `table_name` = \'%s\'',
                 env('DB_DATABASE'),
                 $table
             )
         );
 
         // 处理表名最后的`表`字
-        $tableName = Arr::first($comments)->table_comment ?? '';
+        $tableName = array_change_key_case((array) $comments)['table_comment'] ?? '';
         if (str_ends_with($tableName, '表')) {
             $tableName = rtrim($tableName, '表');
         }

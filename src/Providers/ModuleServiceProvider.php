@@ -31,7 +31,7 @@ class ModuleServiceProvider extends ServiceProvider
     {
         $moduleConfig = $this->app['config']->get('modules');
 
-        if (empty($moduleConfig) || empty($moduleConfig['path'])) {
+        if (empty($moduleConfig) || empty($moduleConfig['path']) || !file_exists($moduleConfig['path'])) {
             return;
         }
         // 因为路由需要提前加载,所以不绑定回调而是绑定已有的实例

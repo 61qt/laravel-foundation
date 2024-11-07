@@ -5,7 +5,6 @@ namespace QT\Foundation\Console;
 use QT\GraphQL\Resolver;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Doctrine\DBAL\Types\Types;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Console\GeneratorCommand;
 use QT\Foundation\Traits\GeneratorModuleHelper;
@@ -49,12 +48,19 @@ class ResolverMakeCommand extends GeneratorCommand
      * @var array
      */
     protected $ruleMaps = [
-        'integer'  => 'int',
-        'smallint' => 'int',
-        'string'   => 'string',
-        'text'     => 'string',
-        'bigint'   => 'int',
-        'datetime' => 'date',
+        'tinyint'    => 'int',
+        'int'        => 'int',
+        'smallint'   => 'int',
+        'mediumint'  => 'int',
+        'bigint'     => 'int',
+        'char'       => 'string',
+        'varchar'    => 'string',
+        'text'       => 'string',
+        'mediumtext' => 'string',
+        'longtext'   => 'string',
+        'datetime'   => 'date',
+        'timestamp'  => 'date',
+        'year'       => 'date',
     ];
 
     /**
@@ -185,15 +191,15 @@ class ResolverMakeCommand extends GeneratorCommand
                 $rule[] = $this->ruleMaps[$column['type_name']];
             }
 
-            if ($column['type_name'] === Types::STRING) {
-                if (preg_match('([A-Za-z]+\(([0-9]+)\))', 'string(11)', $match) === 1) {
-                    $rule[] = "max:{$match[2]}";
+            if (in_array($column['type_name'], ['char', 'varchar'])) {
+                if (preg_match('([A-Za-z]+\(([0-9]+)\))', $column['type'], $match) === 1) {
+                    $rule[] = "max:{$match[1]}";
                 }
             }
 
             if (Str::contains($column['name'], ['is_', 'status'])) {
                 $rule[] = "in_dict:{$table}";
-            } elseif ($column->getUnsigned()) {
+            } elseif (str_contains($column['type'], 'unsigned')) {
                 $rule[] = 'min:0';
             }
 
