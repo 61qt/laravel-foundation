@@ -4,7 +4,6 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 
 class GenerateFile extends Command
 {
@@ -36,11 +35,11 @@ class GenerateFile extends Command
      */
     public function handle()
     {
-        $tables = explode(',', $this->option('tables'));
-
+        $tables = $this->option('tables');
         if (empty($tables)) {
-            return;
+            return $this->error('表名不能为空');
         }
+        $tables = explode(',', $tables);
 
         if ($this->option('all')) {
             $this->input->setOption('model', true);
@@ -50,8 +49,7 @@ class GenerateFile extends Command
         }
 
         foreach ($tables as $table) {
-            $model   = Str::ucfirst(Str::camel(Str::singular($table)));
-            $columns = Schema::getColumnListing($table);
+            $model = Str::ucfirst(Str::camel(Str::singular($table)));
 
             if ($this->option('model')) {
                 $this->call('make:graphql-model', [
@@ -64,7 +62,6 @@ class GenerateFile extends Command
                 $this->call('make:graphql-resolver', [
                     'name'     => "{$model}Resolver",
                     '--module' => $this->option('module'),
-                    '--rules'  => join(',', $columns),
                 ]);
             }
 

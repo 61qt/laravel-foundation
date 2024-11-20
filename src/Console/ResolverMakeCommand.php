@@ -5,7 +5,7 @@ namespace QT\Foundation\Console;
 use QT\GraphQL\Resolver;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Facades\Schema;
+use QT\Foundation\Contracts\TableCache;
 use Illuminate\Console\GeneratorCommand;
 use QT\Foundation\Traits\GeneratorModuleHelper;
 use Symfony\Component\Console\Input\InputOption;
@@ -92,7 +92,7 @@ class ResolverMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $rules   = $this->option('rules');
+        $rules   = $this->option('rules') ? explode(',', $this->option('rules')) : [];
         $model   = $this->option('model');
         $replace = [];
 
@@ -104,7 +104,7 @@ class ResolverMakeCommand extends GeneratorCommand
 
         $table   = Str::snake(Str::pluralStudly($model));
         $replace = $this->buildModelReplacements($replace, $model);
-        $replace = $this->buildRulesReplacements($replace, $table, explode(',', $rules));
+        $replace = $this->buildRulesReplacements($replace, $table, $rules);
         $replace = $this->buildTableCommentReplacements($replace, $table, 'DummyModelComment');
         $replace = $this->buildClassParents($replace, Resolver::class, [
             \App\Resolvers\Resolver::class,
@@ -156,26 +156,15 @@ class ResolverMakeCommand extends GeneratorCommand
      * @param array $ruleColumns
      * @return array
      */
-    protected function buildRulesReplacements(array $replace, string $table, array $ruleColumns): array
+    protected function buildRulesReplacements(array $replace, string $table, array $ruleColumns = []): array
     {
-        if (empty($ruleColumns)) {
-            return $replace;
-        }
-
-        $columns = [];
+        $rules  = [];
+        $indent = str_repeat(' ', 8);
         // 获取表字段以及字段
-        foreach (Schema::getColumns($table) as $column) {
-            $columns[$column['name']] = $column;
-        }
-
-        $rules = [];
-        foreach ($ruleColumns as $ruleColumn) {
-            if (empty($columns[$ruleColumn])) {
+        foreach (TableCache::getColumns($table) as $column) {
+            if (!empty($ruleColumns) && !in_array($column['name'], $ruleColumns)) {
                 continue;
             }
-
-            $rule   = [];
-            $column = $columns[$ruleColumn];
 
             if (in_array($column['name'], [
                 'created_at', 'updated_at', 'deleted_at',
@@ -183,6 +172,7 @@ class ResolverMakeCommand extends GeneratorCommand
                 continue;
             }
 
+            $rule = [];
             if (!$column['nullable']) {
                 $rule[] = 'required';
             }
@@ -204,7 +194,7 @@ class ResolverMakeCommand extends GeneratorCommand
             }
 
             $rule    = implode('|', $rule);
-            $rules[] = str_pad('', 8, ' ', STR_PAD_LEFT) . "'{$ruleColumn}' => '{$rule}',";
+            $rules[] = $indent . "'{$column['name']}' => '{$rule}',";
         }
 
         return array_merge($replace, ['DummyRules' => implode("\n", $rules)]);

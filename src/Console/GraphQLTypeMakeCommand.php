@@ -4,9 +4,9 @@ namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Doctrine\DBAL\Types\Types;
 use QT\GraphQL\Definition\ModelType;
 use Illuminate\Support\Facades\Schema;
+use QT\Foundation\Contracts\TableCache;
 use Illuminate\Console\GeneratorCommand;
 use QT\Foundation\Traits\GeneratorModuleHelper;
 
@@ -46,19 +46,24 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      * @var array
      */
     protected $filterMaps = [
-        Types::INTEGER      => 'int',
-        Types::SMALLINT     => 'int',
-        Types::BOOLEAN      => 'int',
-        Types::BIGINT       => 'bigint',
-        Types::STRING       => 'string',
-        Types::TEXT         => 'string',
-        Types::ASCII_STRING => 'string',
-        'varchar'           => 'string',
+        'boolean'   => 'int',
+        'int'       => 'int',
+        'smallint'  => 'int',
+        'mediumint' => 'int',
+        'tinyint'   => 'int',
+        'bigint'    => 'bigint',
+        'varchar'   => 'string',
+        'char'      => 'string',
+        'year'      => 'string',
+        'string'    => 'string',
+        'timestamp' => 'timestamp',
+        'datetime'  => 'timestamp',
     ];
 
     /** @var array */
     protected $likeFields = [
         'name',
+        'title',
     ];
 
     /**
@@ -143,53 +148,34 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
      */
     protected function buildFilterReplacements(array $replace, string $table): array
     {
-        $columns = [];
-        // 获取表字段以及字段
-        foreach (Schema::getColumns($table) as $column) {
-            $columns[$column['name']] = $column;
-        }
-
-        $func = function ($filters, $column, $type, $operators) {
-            $name   = $column['name'];
-            $method = $this->filterMaps[$type];
-            $filter = "->{$method}('{$name}', {$operators})";
-
-            $filters[$name] = str_pad('', 12, ' ', STR_PAD_LEFT) . $filter;
-        };
-
-        // 根据字典生成默认筛选条件
-        $filters = collect();
-
-        foreach ($columns as $column) {
-            $operators = null;
-            $type      = $column['type_name'];
-            if ($type === Types::BOOLEAN) {
-                $operators = "['=', 'in', '!=']";
-            }
-
-            foreach ($this->likeFields as $field) {
-                if (Str::contains($column['name'], $field)) {
-                    $operators = "['like']";
-                }
-            }
-
-            if (empty($operators)) {
-                continue;
-            }
-
-            $func($filters, $column, $type, $operators);
-        }
-
         // 根据索引生成默认筛选条件
+        $indexColumns = [];
         foreach (Schema::getIndexes($table) as $index) {
             foreach ($index['columns'] as $column) {
-                $column = $columns[$column];
+                $indexColumns[$column] = true;
+            }
+        }
 
-                if (empty($this->filterMaps[$column['type_name']])) {
-                    continue;
+        $filters = [];
+        // 获取表字段以及字段
+        foreach (TableCache::getColumns($table) as $column) {
+            $operators = null;
+            $type      = $column['type_name'];
+            $name      = $column['name'];
+
+            if ($type === 'tinyint') {
+                $operators = "['=', 'in', '!=']";
+            } elseif (in_array($type, ['varchar', 'char', 'string'])) {
+                if (Str::contains($name, $this->likeFields)) {
+                    $operators = "['like', '=']";
                 }
+            }
+            if (isset($indexColumns[$column['name']]) && !empty($this->filterMaps[$type])) {
+                $operators = "['=', 'in']";
+            }
 
-                $func($filters, $column, $column['type_name'], "['=', 'in']");
+            if (!empty($operators)) {
+                $filters[$name] = $this->buildFilterString($name, $type, $operators);
             }
         }
 
@@ -198,12 +184,28 @@ class GraphQLTypeMakeCommand extends GeneratorCommand
         } else {
             $filters = sprintf(
                 "%s\$registrar\n%s;",
-                str_pad('', 8, ' ', STR_PAD_LEFT),
-                $filters->implode("\n"),
+                str_repeat(' ', 8),
+                implode("\n", $filters),
             );
         }
 
         return array_merge($replace, ['DummyFilters' => $filters]);
+    }
+
+    /**
+     * 构建筛选条件
+     *
+     * @param string $name
+     * @param string $type
+     * @param string $operators
+     * @return string
+     */
+    protected function buildFilterString(string $name, string $type, string $operators): string
+    {
+        $method = $this->filterMaps[$type] ?? 'string';
+        $filter = "->{$method}('{$name}', {$operators})";
+
+        return str_repeat(' ', 12) . $filter;
     }
 
     /**

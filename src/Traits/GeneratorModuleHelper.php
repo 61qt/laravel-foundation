@@ -3,8 +3,7 @@
 namespace QT\Foundation\Traits;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use QT\Foundation\Contracts\TableCache;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -145,17 +144,18 @@ STRING;
      *
      * @param array $replace
      * @param string $table
+     * @param array $ignoreColumns
      * @return array
      */
-    protected function buildDataStructureReplacements(array $replace, string $table): array
+    protected function buildDataStructureReplacements(array $replace, string $table, array $ignoreColumns = []): array
     {
         // 获取表字段以及字段
         $dataStructure = [];
-        foreach (Schema::getColumns($table) as $column) {
+        foreach (TableCache::getColumns($table) as $column) {
             $columnType  = $column['type_name'];
             $description = $column['comment'] ?: $column['name'];
 
-            if (empty($this->typeMaps[$columnType])) {
+            if (empty($this->typeMaps[$columnType]) || in_array($column['name'], $ignoreColumns)) {
                 continue;
             }
 
@@ -209,19 +209,7 @@ STRING;
      */
     protected function buildTableCommentReplacements(array $replace, string $table, string $replaceKey): array
     {
-        $comments = DB::selectOne(
-            sprintf(
-                'SELECT `table_comment` FROM `information_schema`.`tables` WHERE `table_schema` = \'%s\' AND `table_name` = \'%s\'',
-                env('DB_DATABASE'),
-                $table
-            )
-        );
-
-        // 处理表名最后的`表`字
-        $tableName = array_change_key_case((array) $comments)['table_comment'] ?? '';
-        if (str_ends_with($tableName, '表')) {
-            $tableName = rtrim($tableName, '表');
-        }
+        $tableName = TableCache::getComment($table);
 
         return array_merge($replace, [
             $replaceKey => $tableName,

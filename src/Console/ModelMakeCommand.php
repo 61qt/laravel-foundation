@@ -3,8 +3,8 @@
 namespace QT\Foundation\Console;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use QT\Foundation\Contracts\TableCache;
 use QT\Foundation\Traits\GeneratorModuleHelper;
 use Illuminate\Foundation\Console\ModelMakeCommand as BaseModelMakeCommand;
 
@@ -58,11 +58,11 @@ class ModelMakeCommand extends BaseModelMakeCommand
         $timestamps = 'public $timestamps = false;';
         $columns    = [];
 
-        foreach (Schema::getColumnListing($table) as $column) {
-            if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
-                $column === 'updated_at' && $timestamps = '';
+        foreach (TableCache::getColumns($table) as $column) {
+            if (in_array($column['name'], ['id', 'created_at', 'updated_at', 'deleted_at'])) {
+                $column['name'] === 'updated_at' && $timestamps = '';
             } else {
-                $columns[] = "{$indent}'{$column}',";
+                $columns[] = "{$indent}'{$column['name']}',";
             }
         }
 

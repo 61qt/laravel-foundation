@@ -44,13 +44,13 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/mutation.stub';
+        return __DIR__ . '/stubs/mutation.stub';
     }
 
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -61,7 +61,7 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
     protected function buildClass($name)
@@ -79,15 +79,17 @@ class GraphQLMutationMakeCommand extends GeneratorCommand
         }
 
         $replace = ['DummyObjectName' => lcfirst($type), 'DummyDescription' => $type, 'DummyTypeName' => $type];
-        $replace = $this->buildDataStructureReplacements($replace, $table);
+        $replace = $this->buildDataStructureReplacements($replace, $table, ['updated_at', 'created_at', 'deleted_at']);
         $replace = $this->buildClassParents($replace, ModelMutation::class, [
             \App\GraphQL\Type\ModelMutation::class,
             \App\GraphQL\Definition\ModelMutation::class,
-            \QT\GraphQL\Definition\ModelMutation::class,
+            ModelMutation::class,
         ]);
 
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            parent::buildClass($name)
         );
     }
 }
