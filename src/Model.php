@@ -2,6 +2,8 @@
 
 namespace QT\Foundation;
 
+use QT\GraphQL\Relations\HasOne;
+use QT\GraphQL\Relations\HasMany;
 use Illuminate\Support\Collection;
 use QT\Foundation\Traits\Exportable;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
@@ -229,5 +231,57 @@ class Model extends EloquentModel
         }
 
         $query->whereKey($this->getKey())->safeDecrement($columns);
+    }
+
+    /**
+     * 定义一对一关系（含额外key）
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $localKey
+     * @param array $extraKeys
+     * @return HasOne
+     */
+    public function hasOneByExtra($related, $foreignKey = null, $localKey = null, array $extraKeys = [])
+    {
+        $instance = $this->newRelatedInstance($related);
+
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return new HasOne(
+            $instance->newQuery(),
+            $this,
+            $instance->getTable() . '.' . $foreignKey,
+            $localKey,
+            $extraKeys
+        );
+    }
+
+    /**
+     * 定义一对多关系（含额外key）
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $localKey
+     * @param array $extraKeys ['model_key' => 'relation_key']
+     * @return HasMany
+     */
+    public function hasManyByExtra($related, $foreignKey = null, $localKey = null, array $extraKeys = [])
+    {
+        $instance = $this->newRelatedInstance($related);
+
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+
+        $localKey = $localKey ?: $this->getKeyName();
+
+        return new HasMany(
+            $instance->newQuery(),
+            $this,
+            $instance->getTable() . '.' . $foreignKey,
+            $localKey,
+            $extraKeys
+        );
     }
 }

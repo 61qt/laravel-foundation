@@ -20,14 +20,10 @@ use QT\Foundation\Export\ExcelGenerator;
  */
 abstract class ExportType extends ObjectType implements Resolvable
 {
-    /**
-     * @var ModelType
-     */
+    /** @var ModelType */
     public $ofType;
 
-    /**
-     * @var ObjectType
-     */
+    /** @var ObjectType */
     public $returnType;
 
     /**
@@ -63,10 +59,13 @@ abstract class ExportType extends ObjectType implements Resolvable
      */
     public function getArgs(GraphQLManager $manager): array
     {
+        $exportColumns = isDevelopEnv() ? array_keys($this->ofType->getExportColumns()) : [];
+
         return [
             'exportColumns' => [
-                'type'        => Type::listOf(Type::string()),
-                'description' => '导出的字段',
+                'type'         => Type::listOf(Type::string()),
+                'description'  => '导出的字段',
+                'defaultValue' => $exportColumns,
             ],
             'filters'       => [
                 'type'        => $this->ofType->getFiltersInput(),
@@ -141,7 +140,7 @@ abstract class ExportType extends ObjectType implements Resolvable
      *
      * @param ExcelGenerator $generator
      * @param Context $context
-     * @param integer $total
+     * @param int $total
      * @param array $args
      * @return mixed
      */
