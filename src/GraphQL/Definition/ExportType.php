@@ -117,7 +117,7 @@ abstract class ExportType extends ObjectType implements Resolvable
             $maxLimit = $context->getValue('graphql.export_limit');
         }
 
-        if ($count == 0) {
+        if ($count === 0) {
             throw new Error('NOT_FOUND', '没有可导出的记录');
         }
 

@@ -205,6 +205,6 @@ trait WhitelistFields
      */
     protected function getTypeName(string $prefix, string $subType): string
     {
-        return $prefix . ucfirst($subType);
+        return $prefix . '_' . ucfirst($subType);
     }
 }

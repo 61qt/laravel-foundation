@@ -55,6 +55,7 @@ class ImportTaskMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         $replace = $this->buildClassParents([], Task::class, [
+            \App\Tasks\Import\ImportTask::class,
             Task::class,
         ]);
 
