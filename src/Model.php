@@ -113,22 +113,6 @@ class Model extends EloquentModel
     }
 
     /**
-     * 延迟查询数据
-     *
-     * @param $query
-     * @param float|int $sleep
-     * @param string $method
-     * @return Collection|Model|null
-     */
-    public static function delayQuery($query, float|int $sleep = 0.5, string $method = 'get')
-    {
-        // 等待db主从同步,微秒级暂停
-        usleep($sleep * 1000000);
-
-        return $query->{$method}();
-    }
-
-    /**
      * 查询单个model,支持失败重试机制
      *
      * @param int $id
@@ -152,10 +136,12 @@ class Model extends EloquentModel
      */
     public static function tryQuery($query, int $tries = 3, string $method = 'get', float|int $sleep = 0.5)
     {
+        $method = strtolower($method);
+
         while ($tries-- > 0) {
             $result = $query->{$method}();
 
-            if ($result instanceof Collection) {
+            if ($method === 'get') {
                 if ($result->isNotEmpty()) {
                     return $result;
                 }
@@ -166,6 +152,8 @@ class Model extends EloquentModel
             // 等待db主从同步,微秒级暂停
             usleep($sleep * 1000000);
         }
+
+        return $method === 'get' ? new Collection([]) : null;
     }
 
     /**
