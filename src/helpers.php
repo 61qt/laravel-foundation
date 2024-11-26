@@ -50,3 +50,37 @@ if (!function_exists('isDebug')) {
         return config('app.debug');
     }
 }
+
+if (!function_exists('array_insert')) {
+    /**
+     * 在指定位置插入数组
+     *
+     * @param array $array
+     * @param string|int $key
+     * @param array $replacement
+     * @return array
+     */
+    function array_insert(array $array, string|int $key, array $replacement): array
+    {
+        if (empty($replacement)) {
+            return $array;
+        }
+
+        if (array_is_list($array)) {
+            array_splice($array, $key, 1, $replacement);
+
+            return $array;
+        }
+
+        $result = [];
+        foreach ($array as $index => $value) {
+            if ($index === $key) {
+                $result = array_merge($result, $replacement);
+                continue;
+            }
+            $result[$index] = $value;
+        }
+
+        return $result;
+    }
+}
