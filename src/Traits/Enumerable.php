@@ -3,24 +3,22 @@
 namespace QT\Foundation\Traits;
 
 use ReflectionClass;
+use QT\Import\Dictionary;
 use Illuminate\Support\Str;
-use QT\Foundation\Dictionaries\Dictionary;
 
 /**
  * 可枚举的model
- * 
+ *
  * @package QT\Foundation\Traits
  */
 trait Enumerable
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     public static $enums = [];
 
     /**
      * 没有设置枚举的字段用的默认值
-     * 
+     *
      * @return array
      */
     protected static function getDefaultDict(): array

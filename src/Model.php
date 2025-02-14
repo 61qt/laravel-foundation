@@ -24,7 +24,11 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
  * @method static static firstOrError($errorMessage = '', $columns = ['*'])
  * @method static static firstOrFail($columns = ['*'])
  * @method static static firstOrNew(array $attributes, array $values = [])
+ * @method \Illuminate\Database\Eloquent\Builder|BaseModel newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BaseModel query()
  * @method static static updateOrCreate(array $attributes, array $values = [])
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder
  *
  * @package QT\Foundation
  */

@@ -45,7 +45,7 @@ class TableCache
             // 处理表名最后的`表`字
             $tableName = array_change_key_case((array) $comments)['table_comment'] ?? '';
             if (str_ends_with($tableName, '表')) {
-                $tableName = rtrim($tableName, '表');
+                $tableName = mb_substr($tableName, 0, -1);
             }
             static::$comments[$table] = $tableName;
         }
