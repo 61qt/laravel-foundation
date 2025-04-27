@@ -56,7 +56,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
         $table      = Str::snake(Str::pluralStudly($this->argument('name')));
         $indent     = str_repeat(' ', 8);
         $timestamps = 'public $timestamps = false;';
-        $columns    = [];
+        $columns    = $enums = [];
 
         foreach (TableCache::getColumns($table) as $column) {
             if (in_array($column['name'], ['id', 'created_at', 'updated_at', 'deleted_at'])) {
@@ -64,12 +64,16 @@ class ModelMakeCommand extends BaseModelMakeCommand
             } else {
                 $columns[] = "{$indent}'{$column['name']}',";
             }
+            if (str_contains($column['comment'], '字典')) {
+                $enums[] = "{$indent}'{$column['name']}',";
+            }
         }
 
         $replace = [
             'DummyColumns'    => implode("\r", $columns),
             'DummyTable'      => $table,
             'DummyTimestamps' => $timestamps,
+            'DummyEnums'      => implode("\r", $enums),
         ];
         $replace = $this->buildClassParents($replace, Model::class, [
             \App\Models\Model::class,

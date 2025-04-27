@@ -33,7 +33,7 @@ trait ImportTaskConstruct
                 throw new Error('SYSTEM_FAILED', static::class . '没有配置model');
             }
 
-            $this->enums = array_keys($this->model::$enums);
+            $this->enums = array_is_list($this->model::$enums) ? $this->model::$enums : array_keys($this->model::$enums);
         }
 
         $maps = [];
