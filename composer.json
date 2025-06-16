@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": "^8.1.0",
-        "laravel/framework": "^10.0 || ^11.0",
+        "laravel/framework": "^10.0 || ^11.0 || ^12.0",
         "guzzlehttp/guzzle": "^7.3",
         "firebase/php-jwt": "^6.0",
         "61qt/laravel-graphql": "^v0.6"
